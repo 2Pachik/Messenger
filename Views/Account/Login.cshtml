@@ -1,0 +1,173 @@
+﻿﻿@using WebApplication1.ViewModels;
+@model LoginVM
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    .inter-semibold {
+        font-family: "Inter", sans-serif;
+        font-size: 32px;
+        font-weight: 600;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+    }
+
+    .inter-regular {
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+    }
+
+    .frame {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+    }
+
+    .nav {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+    }
+
+    input {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .lighter {
+        color: #757575;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    button {
+        margin-top: 20px;
+        padding: 10px;
+        padding-left: 12px;
+        outline: none;
+        border: 1px solid #dcdcde;
+        border-radius: 8px;
+        width: 100%;
+        box-sizing: border-box; /* Added this line */
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        background-color: #1751d0;
+        color: white;
+    }
+
+        button:hover {
+            background-color: #1143ae;
+        }
+
+    .g_id_signin {
+        margin-top: 15px;
+    }
+
+    .under-pass {
+        width: 100%;
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    a {
+        text-decoration: none;
+        color: #1751d0;
+        font-weight: 600;
+    }
+
+    .account-field {
+        width: 100%;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .checkbox-container {
+        cursor: pointer;
+    }
+
+    .or-divider {
+        position: relative;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .or-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #ffffff;
+        color: #757575;
+        padding: 0 10px;
+    }
+
+    .login-divider {
+        width: 100%;
+        height: 0.1px;
+        margin: 0;
+        background-color: #757575;
+    }
+
+</style>
+
+<div class="frame">
+    <div class="inter-semibold">Login to account</div>
+    <form asp-action="Login" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
+        
+        <div class="nav inter-regular lighter">
+            Enter your credentials to access your account
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input asp-for="Email" class="inter-regular form-control" placeholder="Enter email">
+            <span asp-validation-for="Email" class="border-danger"></span>
+
+            <input asp-for="Password" class="inter-regular form-control" placeholder="Enter password">
+            <span asp-validation-for="Password" class="text-danger"></span>
+            
+            <div class="under-pass">
+                <div class="checkbox-container">
+                    <input asp-for="RememberMe" class="form-check-input" /> @Html.DisplayNameFor(a => a.RememberMe)
+                </div>
+                <a href="#">Forgot?</a>
+            </div>
+
+            <button class="inter-regular">Login</button>
+
+            <div class="or-divider">
+                <hr class="login-divider">
+                <span class="or-text">or</span>
+            </div>
+
+            <div class="account-field">
+                <div class="inter-regular">
+                    Not a memeber?
+                    <a href="/Account/Register">Create account</a>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,141 @@
+﻿@using WebApplication1.ViewModels;
+@model RegisterVM
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<style>
+    .inter-semibold {
+        font-family: "Inter", sans-serif;
+        font-size: 32px;
+        font-weight: 600;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+    }
+
+    .inter-regular {
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+    }
+
+    .frame {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+    }
+
+    .nav {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+    }
+
+    input {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .lighter {
+        color: #757575;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    button {
+        margin-top: 20px;
+        padding: 10px;
+        padding-left: 12px;
+        outline: none;
+        border: 1px solid #dcdcde;
+        border-radius: 8px;
+        width: 120%;
+        box-sizing: border-box; /* Added this line */
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        background-color: #1751d0;
+        color: white;
+    }
+
+    button:hover {
+        background-color: #1143ae;
+    }
+
+    .under-pass {
+        width: 120%;
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    a {
+        text-decoration: none;
+        color: #1751d0;
+        font-weight: 600;
+    }
+
+    .account-field {
+        width: 120%;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .checkbox-container {
+        cursor: pointer;
+    }
+
+    .login-divider {
+        width: 100%;
+        height: 0.1px;
+        margin: 0;
+        background-color: #757575;
+    }
+</style>
+
+<div class="frame">
+        <h1 class="inter-semibold">Create your account</h1>
+        <form asp-action="Register" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="nav inter-regular lighter">Enter the fields below to get started
+
+                <input asp-for="Email" class="inter-regular form-control" placeholder="Enter email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+
+                <input asp-for="Password" class="inter-regular form-control" placeholder="Enter password"/>
+                <span asp-validation-for="Password" class="text-danger"></span>
+
+                <input asp-for="ConfirmPassword" class="inter-regular form-control" placeholder="Confirm password"/>
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+                <button class="inter-regular">Create account</button>
+
+                <div class="account-field">
+                    <div class="inter-regular">
+                        Alredy have an account?
+                        <a href="https://localhost:7262/Account/Login">Log in</a>
+                    </div>
+                </div>
+        <div>
+        </form>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async></script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
