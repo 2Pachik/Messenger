@@ -32,7 +32,7 @@
     }
 
     .nav {
-        margin-top: 15px;
+        margin-top: 5px;
         display: flex;
         flex-direction: column;
         text-align: center;
@@ -52,14 +52,14 @@
     input[type="email"],
     input[type="password"],
     button {
-        margin-top: 20px;
+        margin-top: 15px;
         padding: 10px;
         padding-left: 12px;
         outline: none;
         border: 1px solid #dcdcde;
         border-radius: 8px;
         width: 120%;
-        box-sizing: border-box; /* Added this line */
+        box-sizing: border-box;
     }
 
     button {
@@ -75,7 +75,7 @@
 
     .under-pass {
         width: 120%;
-        margin-top: 20px;
+        margin-top: 15px;
         display: flex;
         justify-content: space-between;
     }
@@ -111,13 +111,13 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="nav inter-regular lighter">Enter the fields below to get started
 
-                <input asp-for="Email" class="inter-regular form-control" placeholder="Enter email" />
+                <input asp-for="Email" class="inter-regular" placeholder="Enter email" />
                 <span asp-validation-for="Email" class="text-danger"></span>
 
-                <input asp-for="Password" class="inter-regular form-control" placeholder="Enter password"/>
+                <input asp-for="Password" class="inter-regular" placeholder="Enter password"/>
                 <span asp-validation-for="Password" class="text-danger"></span>
 
-                <input asp-for="ConfirmPassword" class="inter-regular form-control" placeholder="Confirm password"/>
+                <input asp-for="ConfirmPassword" class="inter-regular" placeholder="Confirm password"/>
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
 
                 <button class="inter-regular">Create account</button>

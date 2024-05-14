@@ -25,7 +25,7 @@ namespace WebApplication1.Controllers
         }
 
         [Authorize]
-        public IActionResult Chat()
+		public IActionResult Chat()
         {
             return View();
         }

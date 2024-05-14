@@ -1,36 +1,104 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using WebApplication1.Models;
 using WebApplication1.ViewModels;
 
 namespace WebApplication1.Controllers
 {
-    public class AccountController(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager) : Controller
-    {
-        public IActionResult Login(string? returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
+	public class AccountController : Controller
+	{
+		private readonly SignInManager<AppUser> _signInManager;
+		private readonly UserManager<AppUser> _userManager;
 
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginVM model, string? returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
-            {
-                //login
-                var result = await signInManager.PasswordSignInAsync(model.Email!, model.Password!, model.RememberMe, false);
+		public AccountController(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
+		{
+			_signInManager = signInManager;
+			_userManager = userManager;
+		}
+
+		public IActionResult Login(string? returnUrl = null)
+		{
+			ViewData["ReturnUrl"] = returnUrl;
+			return View();
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Login(LoginVM model, string? returnUrl = null)
+		{
+			ViewData["ReturnUrl"] = returnUrl;
+			if (ModelState.IsValid)
+			{
+                var result = await _signInManager.PasswordSignInAsync(model.Email!, model.Password!, model.RememberMe, false);
 
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Chat", "Home");
                 }
 
+                //ModelState.AddModelError("", "Invalid login attempt");
                 ModelState.AddModelError("", "Invalid login attempt");
+                ViewData["ErrorMessage"] = "Invalid login attempt";
             }
-            return View(model);
-        }
+			return View(model);
+		}
+
+		[HttpGet]
+		public IActionResult ExternalLogin(string provider, string returnUrl = null)
+		{
+			var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+			var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+			return Challenge(properties, provider);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+		{
+			if (remoteError != null)
+			{
+				// Handle external authentication error
+				return RedirectToAction(nameof(Login));
+			}
+
+			var info = await _signInManager.GetExternalLoginInfoAsync();
+			if (info == null)
+			{
+				// Handle external authentication failure
+				return RedirectToAction(nameof(Login));
+			}
+
+			var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+			if (result.Succeeded)
+			{
+				return RedirectToLocal(returnUrl);
+			}
+			if (result.IsLockedOut)
+			{
+				// Handle account locked out
+				return RedirectToAction(nameof(Login));
+			}
+			else
+			{
+				// If the user does not have an account, then create a new account.
+				var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+				var user = new AppUser { UserName = email, Email = email };
+				var createResult = await _userManager.CreateAsync(user);
+				if (createResult.Succeeded)
+				{
+					var addLoginResult = await _userManager.AddLoginAsync(user, info);
+					if (addLoginResult.Succeeded)
+					{
+						await _signInManager.SignInAsync(user, isPersistent: false);
+						return RedirectToLocal(returnUrl);
+					}
+				}
+				// If unable to create or sign in the user, display error page
+				return RedirectToAction(nameof(Login));
+			}
+		}
 
         public IActionResult Register(string? returnUrl = null)
         {
@@ -50,11 +118,11 @@ namespace WebApplication1.Controllers
                     Email = model.Email
                 };
 
-                var result = await userManager.CreateAsync(user, model.Password!);
+                var result = await _userManager.CreateAsync(user, model.Password!);
 
                 if (result.Succeeded)
                 {
-                    await signInManager.SignInAsync(user, false);
+                    await _signInManager.SignInAsync(user, false);
 
                     return RedirectToLocal(returnUrl);
                 }
@@ -66,17 +134,24 @@ namespace WebApplication1.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Logout()
-        {
-            await signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account");
-        }
+        [HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Logout()
+		{
+			await _signInManager.SignOutAsync();
+			return RedirectToAction(nameof(Login));
+		}
 
-        private IActionResult RedirectToLocal(string? returnUrl)
-        {
-            return !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
-                ? Redirect(returnUrl)
-                : RedirectToAction(nameof(HomeController.Chat), nameof(HomeController));
-        }
-    }
+		private IActionResult RedirectToLocal(string? returnUrl)
+		{
+			if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+			{
+				return Redirect(returnUrl);
+			}
+			else
+			{
+				return RedirectToAction("Chat", "Home");
+			}
+		}
+	}
 }
