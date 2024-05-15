@@ -15,5 +15,7 @@ namespace WebApplication1.ViewModels
         [Display(Name = "Confirm Password")]
         [DataType(DataType.Password)]
         public string? ConfirmPassword { get; set; }
+
+        public string? UserName { get; set; }
     }
 }

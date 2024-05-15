@@ -20,6 +20,9 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li>
+                    <form method="post" asp-controller="Account" asp-action="Settings">
+                        <button type="submit" class="dropdown-item">Settings</button>
+                    </form>
                     <form method="post" asp-controller="Account" asp-action="Logout">
                         <button type="submit" class="dropdown-item">Logout</button>
                     </form>

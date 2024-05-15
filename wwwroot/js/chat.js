@@ -8,7 +8,7 @@ document.getElementById("sendButton").disabled = true;
 connection.on("ReceivePrivateMessage", function (user, message) {
     var li = document.createElement("li");
     document.getElementById("messagesList").appendChild(li);
-    li.textContent = `${user} says ${message}`;
+    li.textContent = `${user} : ${message}`;
 });
 
 // Обработчик для загрузки списка пользователей
@@ -38,6 +38,10 @@ document.getElementById("sendButton").addEventListener("click", function (event)
     var receiverEmail = document.getElementById("users").value; // Получаем email получателя
 
     // Вызываем метод SendPrivateMessage на сервере
+    var li = document.createElement("li");
+    document.getElementById("messagesList").appendChild(li);
+    li.textContent = `You : ${message}`;
+
     connection.invoke("SendPrivateMessage", username, receiverEmail, message).catch(function (err) {
         return console.error(err.toString());
     });

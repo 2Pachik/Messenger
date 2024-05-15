@@ -67,8 +67,7 @@
     }
 
     input[type="email"],
-    input[type="password"],
-    button {
+    input[type="password"] {
         margin-top: 15px;
         padding: 10px;
         padding-left: 12px;
@@ -95,10 +94,6 @@
 
     button:hover {
         background-color: #1143ae;
-    }
-
-    .g_id_signin {
-        margin-top: 15px;
     }
 
     .under-pass {
@@ -185,6 +180,17 @@
         align-items: center;
     }
 
+    #login-btn {
+        margin-top: 15px;
+        padding: 10px;
+        padding-left: 12px;
+        outline: none;
+        border: 1px solid #dcdcde;
+        border-radius: 8px;
+        width: 100%;
+        box-sizing: border-box; /* Added this line */
+    }
+
 </style>
 
 <div class="frame">
@@ -215,7 +221,7 @@
                 <a href="#">Forgot?</a>
             </div>
 
-            <button class="inter-regular">Login</button>
+            <button class="inter-regular" id="login-btn">Login</button>
 
             <div class="or-divider">
                 <hr class="login-divider">

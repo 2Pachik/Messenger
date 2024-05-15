@@ -26,6 +26,18 @@ namespace WebApplication1.Controllers
 			return View();
 		}
 
+		public IActionResult Register(string? returnUrl = null)
+		{
+			ViewData["ReturnUrl"] = returnUrl;
+			return View();
+		}
+
+		public IActionResult Settings(string? returnUrl = null)
+		{
+			ViewData["ReturnUrl"] = returnUrl;
+			return View();
+		}
+
 		[HttpPost]
 		public async Task<IActionResult> Login(LoginVM model, string? returnUrl = null)
 		{
@@ -100,12 +112,6 @@ namespace WebApplication1.Controllers
 			}
 		}
 
-        public IActionResult Register(string? returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
-
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM model, string? returnUrl = null)
         {
@@ -132,6 +138,19 @@ namespace WebApplication1.Controllers
                 }
             }
             return View(model);
+        }
+
+        [HttpPost] // not working
+        public async Task<IActionResult> Settings(string userName, string? returnUrl = null)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                user.UserName = userName;
+                await _userManager.UpdateAsync(user);
+            }
+
+            return RedirectToLocal(nameof(Settings));
         }
 
         [HttpPost]
