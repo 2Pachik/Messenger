@@ -1,7 +1,37 @@
-﻿@{
-	ViewData["Title"] = "Chat";
-}
+﻿@page
 
-<h1>@ViewData["Title"]</h1>
+<script>
+    var username = "@User.Identity!.Name";
+</script>
 
-<h1>Успешная авторизация</h1>
+<div class="container">
+    <div class="row p-1">
+        <div class="col-1">Receiver</div>
+        <div class="col-5">
+            <!-- Заменяем поле для ввода email на выпадающий список -->
+            <select id="users" class="w-100"></select>
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-1">Message</div>
+        <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6 text-end">
+            <input type="button" id="sendButton" value="Send Message" />
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <hr />
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <ul id="messagesList"></ul>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>

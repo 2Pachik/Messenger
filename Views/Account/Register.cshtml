@@ -22,6 +22,15 @@
         font-variation-settings: "slnt" 0;
     }
 
+    .inter-regular-valid {
+        font-family: "Inter", sans-serif;
+        font-size: 10px;
+        font-weight: 400;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        padding-left: 5px;
+    }
+
     .frame {
         height: 100vh;
         display: flex;
@@ -36,14 +45,22 @@
         display: flex;
         flex-direction: column;
         text-align: center;
-        align-items: center;
+        align-items: flex-start;
         align-content: center;
         justify-content: center;
     }
 
     input {
+        transition: border 0.3s ease-in-out;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
+        input:hover,
+        input:active,
+        input:focus {
+            border: none;
+            outline: 3px solid #1751d0;
+        }
 
     .lighter {
         color: #757575;
@@ -58,8 +75,15 @@
         outline: none;
         border: 1px solid #dcdcde;
         border-radius: 8px;
-        width: 120%;
-        box-sizing: border-box;
+        width: 100%;
+        box-sizing: border-box; /* Added this line */
+    }
+
+    input:hover,
+    input:focus {
+        border: 1px solid #1751d0;
+        outline: none;
+        transition: border 0.3s ease-in-out; /* Добавлен переход для плавности анимации */
     }
 
     button {
@@ -69,13 +93,17 @@
         color: white;
     }
 
-    button:hover {
-        background-color: #1143ae;
+        button:hover {
+            background-color: #1143ae;
+        }
+
+    .g_id_signin {
+        margin-top: 15px;
     }
 
     .under-pass {
-        width: 120%;
-        margin-top: 15px;
+        width: 100%;
+        margin-top: 10px;
         display: flex;
         justify-content: space-between;
     }
@@ -87,52 +115,68 @@
     }
 
     .account-field {
-        width: 120%;
+        width: 100%;
         margin-top: 10px;
         display: flex;
         justify-content: center;
     }
 
-    .checkbox-container {
-        cursor: pointer;
+    input.error {
+        border: 1px solid red;
+        transition: all 0.3s ease-in-out;
     }
 
-    .login-divider {
-        width: 100%;
-        height: 0.1px;
-        margin: 0;
-        background-color: #757575;
-    }
 </style>
 
 <div class="frame">
-        <h1 class="inter-semibold">Create your account</h1>
-        <form asp-action="Register" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
+    {
+        <div class="text-danger inter-regular">@ViewData["ErrorMessage"]</div>
+    }
+
+    <h1 class="inter-semibold">Create your account</h1>
+    <form asp-action="Register" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
+@*     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+ *@    
         <div class="nav inter-regular lighter">Enter the fields below to get started
 
-                <input asp-for="Email" class="inter-regular" placeholder="Enter email" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+            <input asp-for="Email" class="inter-regular" placeholder="Enter email">
+            <span asp-validation-for="Email" class="text-danger inter-regular-valid"></span>
 
-                <input asp-for="Password" class="inter-regular" placeholder="Enter password"/>
-                <span asp-validation-for="Password" class="text-danger"></span>
+            <input asp-for="Password" class="inter-regular" placeholder="Enter password">
+            <span asp-validation-for="Password" class="text-danger inter-regular-valid"></span>
 
-                <input asp-for="ConfirmPassword" class="inter-regular" placeholder="Confirm password"/>
-                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            <input asp-for="ConfirmPassword" class="inter-regular" placeholder="Confirm password">
+            <span asp-validation-for="ConfirmPassword" class="text-danger inter-regular-valid"></span>
 
-                <button class="inter-regular">Create account</button>
+            <button class="inter-regular">Create account</button>
 
-                <div class="account-field">
-                    <div class="inter-regular">
-                        Alredy have an account?
-                        <a href="https://localhost:7262/Account/Login">Log in</a>
-                    </div>
+            <div class="account-field">
+                <div class="inter-regular">
+                    Alredy have an account?
+                    <a href="https://localhost:7262/">Log in</a>
                 </div>
+            </div>
+
         <div>
         </form>
 </div>
 
-<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var inputs = document.querySelectorAll('input');
+        inputs.forEach(function (input) {
+            input.addEventListener('input', function () {
+                if (input.checkValidity() == false) {
+                    input.classList.add('error');
+                } else {
+                    input.classList.remove('error'); // Возвращаем цвет рамки к исходному состоянию, если поле валидно
+                }
+            });
+        });
+    });
+</script>
 
 @section Scripts {
     @{

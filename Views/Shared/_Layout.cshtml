@@ -1,40 +1,38 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-<head>
+<head class="inter-regular">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - WebApplication1</title>
+    <title>BlinkTalk</title>
+    <link rel="icon" href="~/logo.ico" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
-
-    <style>
-        body {
-            overflow: hidden;
-        }
-    </style>
 </head>
-<body>
-
-    <header>
+<body class="inter-regular">
+    <header class="inter-semibold-16">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CustomIdentity</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <div class="main-logo">
+                   <img src="~/logo.ico" width="32" height="32">
+                   <div>BlinkTalk</div>
+                </div>
+@*                 <a class="navbar-brand" asp-area="" asp-controller="Account" asp-action="Login">BlinkTalk</a>
+ *@                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
+                        @* <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        </li> *@
                     </ul>
                     <partial name="_LoginPartial"/>
                 </div>
@@ -54,3 +52,40 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+<style>
+    .inter-semibold-16 {
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+    }
+
+    .inter-regular {
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+    .main-logo {
+        display: inline-flex;
+        flex-wrap: nowrap;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<script>
+    function getHeaderHeight() {
+        var header = document.getElementsByClassName('nav');
+        console.log("Header height:", header.clientHeight);
+    }    
+</script>
