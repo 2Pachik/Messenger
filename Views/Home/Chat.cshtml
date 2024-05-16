@@ -4,10 +4,64 @@
     var username = "@User.Identity!.Name";
 </script>
 
+<script>
+    // Функция для поиска пользователей
+    function searchUsers() {
+        // Получаем значение поискового запроса
+        var searchValue = document.getElementById("searchInput").value.toLowerCase();
+        // Получаем список всех пользователей в селекте
+        var usersSelect = document.getElementById("users");
+        var options = usersSelect.getElementsByTagName("option");
+
+        // Перебираем все опции в селекте
+        for (var i = 0; i < options.length; i++) {
+            var option = options[i];
+            var username = option.textContent.toLowerCase();
+            // Проверяем, содержит ли имя пользователя поисковой запрос
+            if (username.indexOf(searchValue) !== -1) {
+                // Если содержит, то показываем этого пользователя
+                option.style.display = "block";
+            } else {
+                // Если не содержит, то скрываем этого пользователя
+                option.style.display = "none";
+            }
+        }
+    }
+</script>
+
+<script>
+    // Функция для открытия диалогового окна
+    function openDialog() {
+        var dialog = document.getElementById("dialog");
+        dialog.showModal();
+    }
+
+    // Функция для закрытия диалогового окна
+    function closeDialog() {
+        var dialog = document.getElementById("dialog");
+        dialog.close();
+    }
+
+    // Ожидаем, пока DOM полностью загрузится
+    document.addEventListener("DOMContentLoaded", function () {
+        // Обработчик события click для кнопки "add"
+        document.getElementById("show").addEventListener("click", openDialog);
+
+        // Обработчик события click для кнопки "close" в диалоговом окне
+        document.querySelector("#dialog .close").addEventListener("click", closeDialog);
+    });
+</script>
+
+
 <div class="container">
+    <div class="row p-1">
+        <div class="col-1">Add friend</div>
+        <div class="col-5"><button id="show">add</button></div>
+    </div>
     <div class="row p-1">
         <div class="col-1">Receiver</div>
         <div class="col-5">
+            <input type="text" class="w-100" id="searchInput" oninput="searchUsers()" placeholder="Search users">
             <select id="users" class="w-100"></select>
         </div>
     </div>
@@ -30,6 +84,13 @@
             <ul id="messagesList"></ul>
         </div>
     </div>
+
+    <dialog id="dialog">
+        <input type="text" placeholder="Email"></input>
+        <input type="text" placeholder="Name"></input>
+        <button>add</button>
+        <button class="close">close</button>
+    </dialog>
 </div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
