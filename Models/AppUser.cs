@@ -9,5 +9,8 @@ namespace WebApplication1.Models
         [MaxLength(100)]
         [Required]
         public string? Email { get; set; }
+
+        public ICollection<UserConversation> UserConversations { get; set; }
+        public ICollection<Message> Messages { get; set; }
     }
 }

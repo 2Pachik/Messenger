@@ -17,7 +17,6 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(conn
 builder.Services.AddIdentity<AppUser, IdentityRole>(
     options =>
     {
-        options.User.RequireUniqueEmail = true;
         options.Password.RequiredUniqueChars = 0;
         options.Password.RequireUppercase = false;
         options.Password.RequiredLength = 8;
@@ -42,7 +41,6 @@ builder.Services.AddAuthentication(options =>
     googleOptions.ClientSecret = "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";
 });
 
-builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 
 var app = builder.Build();
@@ -50,11 +48,8 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
-}
-else
-{
-    app.UseDeveloperExceptionPage();
 }
 
 app.UseWebSockets();
@@ -64,7 +59,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();
+//app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -75,7 +70,6 @@ app.MapControllerRoute(
     name: "chat",
     pattern: "{controller=Home}/{action=Chat}/{id?}");
 
-app.MapRazorPages();
 app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
