@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,16 +12,24 @@ namespace WebApplication1.Controllers
 {
 	public class AccountController : Controller
 	{
-		private readonly SignInManager<AppUser> _signInManager;
-		private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IEmailSender _emailSender;
+        private readonly ILogger<AccountController> _logger;
 
-		public AccountController(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
-		{
-			_signInManager = signInManager;
-			_userManager = userManager;
-		}
+        public AccountController(
+            SignInManager<AppUser> signInManager,
+            UserManager<AppUser> userManager,
+            IEmailSender emailSender,
+            ILogger<AccountController> logger)
+        {
+            _signInManager = signInManager;
+            _userManager = userManager;
+            _emailSender = emailSender;
+            _logger = logger;
+        }
 
-		public IActionResult Login(string? returnUrl = null)
+        public IActionResult Login(string? returnUrl = null)
 		{
 			ViewData["ReturnUrl"] = returnUrl;
 			return View();
@@ -128,8 +137,11 @@ namespace WebApplication1.Controllers
 
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, false);
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token = token }, Request.Scheme);
+                    await _emailSender.SendEmailAsync(user.Email, "Confirm your email", $"Please confirm your email by clicking this link: {confirmationLink}");
 
+                    await _signInManager.SignInAsync(user, false);
                     return RedirectToLocal(returnUrl);
                 }
                 foreach (var error in result.Errors)
@@ -139,6 +151,30 @@ namespace WebApplication1.Controllers
             }
             return View(model);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (userId == null || token == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return View("ConfirmEmail");
+            }
+
+            return View("Error");
+        }
+
 
         [HttpPost] // not working
         public async Task<IActionResult> Settings(string userName, string? returnUrl = null)

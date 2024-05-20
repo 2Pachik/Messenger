@@ -2,15 +2,20 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Hubs;
 using WebApplication1.Models;
+using WebApplication1.Services;
+using WebApplication1.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("default");
 
+builder.Services.Configure<ConfirmEmailVM>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
@@ -22,6 +27,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(
         options.Password.RequiredLength = 8;
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequireLowercase = false;
+        options.SignIn.RequireConfirmedAccount = true; // Require email confirmation
     })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
