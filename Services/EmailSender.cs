@@ -19,13 +19,15 @@ namespace WebApplication1.Services
         public async Task SendEmailAsync(string email, string subject, string message)
         {
             var mimeMessage = new MimeMessage();
-            mimeMessage.From.Add(new MailboxAddress("My App", _smtpSettings.UserName));
+            mimeMessage.From.Add(new MailboxAddress("BlinkTalk", _smtpSettings.UserName));
             mimeMessage.To.Add(new MailboxAddress("", email));
             mimeMessage.Subject = subject;
-            mimeMessage.Body = new TextPart("plain")
+
+            var bodyBuilder = new BodyBuilder
             {
-                Text = message
+                HtmlBody = message
             };
+            mimeMessage.Body = bodyBuilder.ToMessageBody();
 
             using (var client = new SmtpClient())
             {

@@ -47,7 +47,13 @@ namespace WebApplication1.Controllers
 			return View();
 		}
 
-		[HttpPost]
+        public IActionResult CheckEmail(string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        [HttpPost]
 		public async Task<IActionResult> Login(LoginVM model, string? returnUrl = null)
 		{
 			ViewData["ReturnUrl"] = returnUrl;
@@ -75,51 +81,60 @@ namespace WebApplication1.Controllers
 			return Challenge(properties, provider);
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
-		{
-			if (remoteError != null)
-			{
-				// Handle external authentication error
-				return RedirectToAction(nameof(Login));
-			}
+        [HttpGet]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            if (remoteError != null)
+            {
+                // Handle external authentication error
+                return RedirectToAction(nameof(Login));
+            }
 
-			var info = await _signInManager.GetExternalLoginInfoAsync();
-			if (info == null)
-			{
-				// Handle external authentication failure
-				return RedirectToAction(nameof(Login));
-			}
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                // Handle external authentication failure
+                return RedirectToAction(nameof(Login));
+            }
 
-			var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
-			if (result.Succeeded)
-			{
-				return RedirectToLocal(returnUrl);
-			}
-			if (result.IsLockedOut)
-			{
-				// Handle account locked out
-				return RedirectToAction(nameof(Login));
-			}
-			else
-			{
-				// If the user does not have an account, then create a new account.
-				var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-				var user = new AppUser { UserName = email, Email = email };
-				var createResult = await _userManager.CreateAsync(user);
-				if (createResult.Succeeded)
-				{
-					var addLoginResult = await _userManager.AddLoginAsync(user, info);
-					if (addLoginResult.Succeeded)
-					{
-						await _signInManager.SignInAsync(user, isPersistent: false);
-						return RedirectToLocal(returnUrl);
-					}
-				}
-				// If unable to create or sign in the user, display error page
-				return RedirectToAction(nameof(Login));
-			}
-		}
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            if (result.Succeeded)
+            {
+                var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                if (user != null)
+                {
+                    // Устанавливаем EmailConfirmed в true
+                    user.EmailConfirmed = true;
+                    await _userManager.UpdateAsync(user);
+                }
+
+                return RedirectToLocal(returnUrl);
+            }
+            if (result.IsLockedOut)
+            {
+                // Handle account locked out
+                return RedirectToAction(nameof(Login));
+            }
+            else
+            {
+                // If the user does not have an account, then create a new account.
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                var user = new AppUser { UserName = email, Email = email, EmailConfirmed = true }; // Устанавливаем EmailConfirmed в true
+                var createResult = await _userManager.CreateAsync(user);
+                if (createResult.Succeeded)
+                {
+                    var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                    if (addLoginResult.Succeeded)
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return RedirectToLocal(returnUrl);
+                    }
+                }
+                // If unable to create or sign in the user, display error page
+                return RedirectToAction(nameof(Login));
+            }
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM model, string? returnUrl = null)
@@ -139,10 +154,18 @@ namespace WebApplication1.Controllers
                 {
                     var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token = token }, Request.Scheme);
-                    await _emailSender.SendEmailAsync(user.Email, "Confirm your email", $"Please confirm your email by clicking this link: {confirmationLink}");
 
-                    await _signInManager.SignInAsync(user, false);
-                    return RedirectToLocal(returnUrl);
+                    _logger.LogInformation("Confirmation link: {confirmationLink}", confirmationLink);
+
+                    var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views\\EmailTemplates", "ConfirmationEmailTemplate.html");
+                    var emailTemplate = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+					var emailBody = emailTemplate.Replace("{0}", confirmationLink);
+
+                    await _emailSender.SendEmailAsync(user.Email, "Confirm your email", emailBody);
+
+                    _logger.LogInformation("User created a new account with password.");
+
+                    return RedirectToAction("CheckEmail", "Account");
                 }
                 foreach (var error in result.Errors)
                 {
@@ -151,6 +174,8 @@ namespace WebApplication1.Controllers
             }
             return View(model);
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
