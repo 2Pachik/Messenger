@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -11,9 +12,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240522064521_Fix_b")]
+    partial class Fix_b
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -399,8 +402,6 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("ChatID");
 
-                    b.HasIndex("Timestamp");
-
                     b.HasIndex("UserID");
 
                     b.ToTable("Messages");
@@ -553,18 +554,16 @@ namespace WebApplication1.Migrations
                 {
                     b.HasOne("WebApplication1.Models.Chat", "Chat")
                         .WithMany("MediaFiles")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ChatId");
 
                     b.HasOne("WebApplication1.Models.Message", "Message")
                         .WithMany("MediaFiles")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("MessageId");
 
                     b.HasOne("WebApplication1.Models.AppUser", "User")
                         .WithMany("MediaFiles")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Chat");

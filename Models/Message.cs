@@ -1,14 +1,19 @@
-﻿namespace WebApplication1.Models
+﻿using System;
+
+namespace WebApplication1.Models
 {
     public class Message
     {
-        public int Id { get; set; }
-        public int ConversationId { get; set; }
-        public string SenderId { get; set; }
-        public string Content { get; set; }
-        public DateTime SentAt { get; set; } = DateTime.Now;
+        public int MessageID { get; set; }
+        public string UserID { get; set; }
+        public int ChatID { get; set; }
+        public string Text { get; set; }
+        public DateTime Timestamp { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool IsRead { get; set; } // Добавлено свойство для отслеживания прочтения сообщения
+        public virtual ICollection<MediaFile> MediaFiles { get; set; } = new List<MediaFile>();
 
-        public Conversation Conversation { get; set; }
-        public AppUser Sender { get; set; }
+        public virtual AppUser User { get; set; }
+        public virtual Chat Chat { get; set; }
     }
 }
