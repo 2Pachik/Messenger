@@ -30,26 +30,20 @@
 </script>
 
 <script>
-    // Функция для открытия диалогового окна
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("show").addEventListener("click", openDialog);
+        document.querySelector("#dialog .close").addEventListener("click", closeDialog);
+    });
+
     function openDialog() {
         var dialog = document.getElementById("dialog");
         dialog.showModal();
     }
 
-    // Функция для закрытия диалогового окна
     function closeDialog() {
         var dialog = document.getElementById("dialog");
         dialog.close();
     }
-
-    // Ожидаем, пока DOM полностью загрузится
-    document.addEventListener("DOMContentLoaded", function () {
-        // Обработчик события click для кнопки "add"
-        document.getElementById("show").addEventListener("click", openDialog);
-
-        // Обработчик события click для кнопки "close" в диалоговом окне
-        document.querySelector("#dialog .close").addEventListener("click", closeDialog);
-    });
 </script>
 
 
@@ -61,7 +55,7 @@
     <div class="row p-1">
         <div class="col-1">Receiver</div>
         <div class="col-5">
-            <input type="text" class="w-100" id="searchInput" oninput="searchUsers()" placeholder="Search users">
+            <input type="text" class="w-100" id="searchInput" oninput="searchUsers()" placeholder="Search contacts">
             <select id="users" class="w-100"></select>
         </div>
     </div>
@@ -86,12 +80,12 @@
     </div>
 
     <dialog id="dialog">
-        <input type="text" placeholder="Email"></input>
-        <input type="text" placeholder="Name"></input>
-        <button>add</button>
-        <button class="close">close</button>
+        <input type="text" id="contactEmailInput" placeholder="Email"></input>
+        <button id="addContactButton">Add</button>
+        <button class="close">Close</button>
     </dialog>
 </div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
+

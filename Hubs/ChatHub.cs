@@ -2,119 +2,79 @@
 using Microsoft.AspNetCore.Identity;
 using WebApplication1.Models;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Data;
+using System.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using WebApplication1.Data;
 
 namespace WebApplication1.Hubs
 {
     public class ChatHub : Hub
     {
-    //    private readonly UserManager<AppUser> _userManager;
-    //    private readonly AppDbContext _context;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly AppDbContext _context;
 
-    //    public ChatHub(UserManager<AppUser> userManager, AppDbContext context)
-    //    {
-    //        _userManager = userManager;
-    //        _context = context;
-    //    }
+        public ChatHub(UserManager<AppUser> userManager, AppDbContext context)
+        {
+            _userManager = userManager;
+            _context = context;
+        }
 
-    //    public async override Task OnConnectedAsync()
-    //    {
-    //        var users = await GetAllUsers(); // Получаем список всех пользователей
+        public override async Task OnConnectedAsync()
+        {
+            var userEmail = Context.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(userEmail);
 
-    //        var userEmail = Context.User.Identity.Name;
-    //        var user = await _userManager.FindByNameAsync(userEmail);
+            if (user != null)
+            {
+                var contacts = await GetUserContacts(user.Id);
+                await Clients.Caller.SendAsync("LoadContacts", contacts);
+            }
 
-    //        if (user != null)
-    //        {
-    //            var messages = await GetMessages(user.Id);
-    //            await Clients.Caller.SendAsync("LoadData", users, messages); // Передаем список пользователей клиенту
-    //            //await Clients.Caller.SendAsync("LoadUsers", users); // Передаем список пользователей клиенту
-    //            //await Clients.Caller.SendAsync("LoadMessages", messages);
-    //        }
+            await base.OnConnectedAsync();
+        }
 
-    //        await base.OnConnectedAsync();
-    //    }
+        public async Task AddContactByEmail(string email)
+        {
+            var userEmail = Context.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(userEmail);
+            var contact = await _userManager.FindByNameAsync(email);
 
+            if (user == null || contact == null)
+            {
+                await Clients.Caller.SendAsync("Error", "User or contact not found");
+                return;
+            }
 
-    //    private async Task<List<MessageDto>> GetMessages(string userId)
-    //    {
-    //        var messages = await _context.UserConversations
-    //            .Where(uc => uc.UserId == userId)
-    //            .SelectMany(uc => uc.Conversation.Messages)
-    //            .Select(m => new MessageDto
-    //            {
-    //                Sender = m.Sender.Email,
-    //                Content = m.Content,
-    //                SentAt = m.SentAt
-    //            })
-    //            .ToListAsync();
+            var existingContact = await _context.Contacts
+                .FirstOrDefaultAsync(c => c.UserId == user.Id && c.ContactId == contact.Id);
 
-    //        return messages;
-    //    }
+            if (existingContact != null)
+            {
+                await Clients.Caller.SendAsync("Error", "Contact already exists");
+                return;
+            }
 
-    //    private async Task<List<string>> GetAllUsers()
-    //    {
-    //        var users = await _userManager.Users.Select(u => u.UserName).ToListAsync();
-    //        return users;
-    //    }
+            var newContact = new Contact
+            {
+                UserId = user.Id,
+                ContactId = contact.Id
+            };
 
-    //    public async Task SendPrivateMessage(string sender, string receiverEmail, string message)
-    //    {
-    //        var receiver = await _userManager.FindByNameAsync(receiverEmail);
+            _context.Contacts.Add(newContact);
+            await _context.SaveChangesAsync();
 
-    //        if (receiver != null)
-    //        {
-    //            var conversation = await GetOrCreateConversation(sender, receiver.Email);
+            await Clients.Caller.SendAsync("ContactAdded", email);
+        }
 
-    //            var newMessage = new Message
-    //            {
-    //                ConversationId = conversation.Id,
-    //                SenderId = (await _userManager.FindByNameAsync(sender)).Id,
-    //                Content = message
-    //            };
-
-    //            _context.Messages.Add(newMessage);
-    //            await _context.SaveChangesAsync();
-
-    //            await Clients.User(receiver.Id).SendAsync("ReceivePrivateMessage", sender, message);
-    //        }
-    //        else
-    //        {
-    //            // Handle case when the receiver is not found
-    //        }
-    //    }
-
-    //    private async Task<Conversation> GetOrCreateConversation(string senderEmail, string receiverEmail)
-    //    {
-    //        var conversation = await _context.UserConversations
-    //            .Where(uc => (uc.User.Email == senderEmail && uc.User.Email == receiverEmail))
-    //            .Select(uc => uc.Conversation)
-    //            .FirstOrDefaultAsync();
-
-    //        if (conversation == null)
-    //        {
-    //            conversation = new Conversation
-    //            {
-    //                Name = $"{senderEmail} - {receiverEmail}" // Set a meaningful name for the conversation
-    //            };
-    //            _context.Conversations.Add(conversation);
-
-    //            await _context.SaveChangesAsync();
-
-    //            var sender = await _userManager.FindByNameAsync(senderEmail);
-    //            var receiver = await _userManager.FindByNameAsync(receiverEmail);
-
-    //            _context.UserConversations.Add(new UserConversation { UserId = sender.Id, ConversationId = conversation.Id });
-    //            _context.UserConversations.Add(new UserConversation { UserId = receiver.Id, ConversationId = conversation.Id });
-
-    //            await _context.SaveChangesAsync();
-    //        }
-
-    //        return conversation;
-    //    }
-
+        private async Task<List<string>> GetUserContacts(string userId)
+        {
+            var contacts = await _context.Contacts
+                .Where(c => c.UserId == userId)
+                .Select(c => c.ContactUser.Email)
+                .ToListAsync();
+            return contacts;
+        }
     }
 }

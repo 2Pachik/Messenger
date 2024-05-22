@@ -1,10 +1,10 @@
 ﻿namespace WebApplication1.Models
 {
-    public class Contact
+    public class ChatMember
     {
+        public int ChatId { get; set; }
+        public Chat Chat { get; set; }
         public string UserId { get; set; }
         public AppUser User { get; set; }
-        public string ContactId { get; set; }
-        public AppUser ContactUser { get; set; }
     }
 }

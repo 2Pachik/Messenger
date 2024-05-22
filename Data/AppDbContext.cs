@@ -6,139 +6,111 @@ namespace WebApplication1.Data
 {
     public class AppDbContext : IdentityDbContext<AppUser>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
         {
         }
 
-        public DbSet<Chat> Chats { get; set; }
-        public DbSet<ChatParticipant> ChatParticipants { get; set; }
         public DbSet<Contact> Contacts { get; set; }
-        public DbSet<MediaFile> MediaFiles { get; set; }
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<ChatMember> ChatMembers { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet<MessageRead> MessageReads { get; set; }
+        public DbSet<Models.File> Files { get; set; }
+        public DbSet<VoiceMessage> VoiceMessages { get; set; }
         public DbSet<VideoCall> VideoCalls { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // AppUser and Identity
-            modelBuilder.Entity<AppUser>()
-                .HasMany(u => u.Messages)
-                .WithOne(m => m.User)
-                .HasForeignKey(m => m.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<AppUser>()
-                .HasMany(u => u.ChatParticipants)
-                .WithOne(cp => cp.User)
-                .HasForeignKey(cp => cp.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<AppUser>()
-                .HasMany(u => u.Contacts)
-                .WithOne(c => c.User)
-                .HasForeignKey(c => c.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<AppUser>()
-                .HasMany(u => u.MediaFiles)
-                .WithOne(mf => mf.User)
-                .HasForeignKey(mf => mf.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Chat
-            modelBuilder.Entity<Chat>()
-                .HasMany(c => c.Messages)
-                .WithOne(m => m.Chat)
-                .HasForeignKey(m => m.ChatID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Chat>()
-                .HasMany(c => c.Participants)
-                .WithOne(p => p.Chat)
-                .HasForeignKey(p => p.ChatID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Chat>()
-                .HasMany(c => c.MediaFiles)
-                .WithOne(mf => mf.Chat)
-                .HasForeignKey(mf => mf.ChatId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // ChatParticipant
-            modelBuilder.Entity<ChatParticipant>()
-                .HasKey(cp => new { cp.ChatID, cp.UserID });
-
-            // Contact
             modelBuilder.Entity<Contact>()
-                .HasKey(c => c.ContactID);
+                .HasKey(c => new { c.UserId, c.ContactId });
 
             modelBuilder.Entity<Contact>()
-                .HasOne(c => c.Friend)
+                .HasOne(c => c.User)
+                .WithMany(u => u.Contacts)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Contact>()
+                .HasOne(c => c.ContactUser)
                 .WithMany()
-                .HasForeignKey(c => c.FriendID)
+                .HasForeignKey(c => c.ContactId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // MediaFile
-            modelBuilder.Entity<MediaFile>()
-                .HasKey(mf => mf.Id);
+            modelBuilder.Entity<Chat>()
+                .HasKey(c => c.Id);
 
-            modelBuilder.Entity<MediaFile>()
-                .HasOne(mf => mf.Message)
-                .WithMany(m => m.MediaFiles)
-                .HasForeignKey(mf => mf.MessageId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<ChatMember>()
+                .HasKey(cm => new { cm.ChatId, cm.UserId });
 
-            // Message
+            modelBuilder.Entity<ChatMember>()
+                .HasOne(cm => cm.Chat)
+                .WithMany(c => c.ChatMembers)
+                .HasForeignKey(cm => cm.ChatId);
+
+            modelBuilder.Entity<ChatMember>()
+                .HasOne(cm => cm.User)
+                .WithMany(u => u.ChatMembers)
+                .HasForeignKey(cm => cm.UserId);
+
             modelBuilder.Entity<Message>()
-                .HasKey(m => m.MessageID);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.User)
-                .WithMany(u => u.Messages)
-                .HasForeignKey(m => m.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasKey(m => m.Id);
 
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Chat)
                 .WithMany(c => c.Messages)
-                .HasForeignKey(m => m.ChatID)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(m => m.ChatId);
 
             modelBuilder.Entity<Message>()
-                .HasIndex(m => m.Timestamp);
+                .HasOne(m => m.Sender)
+                .WithMany(u => u.Messages)
+                .HasForeignKey(m => m.SenderId);
 
-            // MessageRead
-            modelBuilder.Entity<MessageRead>()
-                .HasKey(mr => mr.Id);
+            modelBuilder.Entity<Models.File>()
+                .HasKey(f => f.Id);
 
-            modelBuilder.Entity<MessageRead>()
-                .HasOne(mr => mr.Message)
-                .WithMany()
-                .HasForeignKey(mr => mr.MessageID)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Models.File>()
+                .HasOne(f => f.Chat)
+                .WithMany(c => c.Files)
+                .HasForeignKey(f => f.ChatId);
 
-            modelBuilder.Entity<MessageRead>()
-                .HasOne(mr => mr.User)
-                .WithMany()
-                .HasForeignKey(mr => mr.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Models.File>()
+                .HasOne(f => f.Sender)
+                .WithMany(u => u.Files)
+                .HasForeignKey(f => f.SenderId);
 
-            // VideoCall
+            modelBuilder.Entity<VoiceMessage>()
+                .HasKey(vm => vm.Id);
+
+            modelBuilder.Entity<VoiceMessage>()
+                .HasOne(vm => vm.Chat)
+                .WithMany(c => c.VoiceMessages)
+                .HasForeignKey(vm => vm.ChatId);
+
+            modelBuilder.Entity<VoiceMessage>()
+                .HasOne(vm => vm.Sender)
+                .WithMany(u => u.VoiceMessages)
+                .HasForeignKey(vm => vm.SenderId);
+
             modelBuilder.Entity<VideoCall>()
                 .HasKey(vc => vc.Id);
 
             modelBuilder.Entity<VideoCall>()
+                .HasOne(vc => vc.Chat)
+                .WithMany(c => c.VideoCalls)
+                .HasForeignKey(vc => vc.ChatId);
+
+            modelBuilder.Entity<VideoCall>()
                 .HasOne(vc => vc.Caller)
-                .WithMany()
-                .HasForeignKey(vc => vc.CallerID)
+                .WithMany(u => u.VideoCalls)
+                .HasForeignKey(vc => vc.CallerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<VideoCall>()
-                .HasOne(vc => vc.Receiver)
+                .HasOne(vc => vc.Callee)
                 .WithMany()
-                .HasForeignKey(vc => vc.ReceiverID)
+                .HasForeignKey(vc => vc.CalleeId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

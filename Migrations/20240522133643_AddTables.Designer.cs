@@ -12,8 +12,8 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240522073110_Fix_c")]
-    partial class Fix_c
+    [Migration("20240522133643_AddTables")]
+    partial class AddTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,33 +24,6 @@ namespace WebApplication1.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("MessageRead", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("MessageID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ReadTimestamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MessageID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("MessageReads");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -253,81 +226,58 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("WebApplication1.Models.Chat", b =>
                 {
-                    b.Property<int>("ChatID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChatID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ChatName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreationTime")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsGroup")
                         .HasColumnType("bit");
 
-                    b.HasKey("ChatID");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Chats");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.ChatParticipant", b =>
+            modelBuilder.Entity("WebApplication1.Models.ChatMember", b =>
                 {
-                    b.Property<int>("ChatID")
+                    b.Property<int>("ChatId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserID")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
+                    b.HasKey("ChatId", "UserId");
 
-                    b.Property<DateTime>("JoinedDate")
-                        .HasColumnType("datetime2");
+                    b.HasIndex("UserId");
 
-                    b.HasKey("ChatID", "UserID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("ChatParticipants");
+                    b.ToTable("ChatMembers");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Contact", b =>
                 {
-                    b.Property<int>("ContactID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ContactID"));
-
-                    b.Property<DateTime>("AddedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FriendID")
-                        .IsRequired()
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserID")
-                        .IsRequired()
+                    b.Property<string>("ContactId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ContactID");
+                    b.HasKey("UserId", "ContactId");
 
-                    b.HasIndex("FriendID");
-
-                    b.HasIndex("UserID");
+                    b.HasIndex("ContactId");
 
                     b.ToTable("Contacts");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.MediaFile", b =>
+            modelBuilder.Entity("WebApplication1.Models.File", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -335,76 +285,60 @@ namespace WebApplication1.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ChatId")
+                    b.Property<int>("ChatId")
                         .HasColumnType("int");
 
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FileType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("MessageId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("Size")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("UploadDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
+                    b.Property<string>("SenderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ChatId");
 
-                    b.HasIndex("MessageId");
+                    b.HasIndex("SenderId");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("MediaFiles");
+                    b.ToTable("Files");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Message", b =>
                 {
-                    b.Property<int>("MessageID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ChatID")
+                    b.Property<int>("ChatId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Text")
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("MessageType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserID")
+                    b.Property<string>("SenderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("MessageID");
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
 
-                    b.HasIndex("ChatID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Timestamp");
+                    b.HasIndex("ChatId");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("SenderId");
 
                     b.ToTable("Messages");
                 });
@@ -417,50 +351,63 @@ namespace WebApplication1.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CallStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CallerID")
+                    b.Property<string>("CalleeId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("EndTime")
+                    b.Property<string>("CallerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ChatId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ReceiverID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime>("StartedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CallerID");
+                    b.HasIndex("CalleeId");
 
-                    b.HasIndex("ReceiverID");
+                    b.HasIndex("CallerId");
+
+                    b.HasIndex("ChatId");
 
                     b.ToTable("VideoCalls");
                 });
 
-            modelBuilder.Entity("MessageRead", b =>
+            modelBuilder.Entity("WebApplication1.Models.VoiceMessage", b =>
                 {
-                    b.HasOne("WebApplication1.Models.Message", "Message")
-                        .WithMany()
-                        .HasForeignKey("MessageID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.HasOne("WebApplication1.Models.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Navigation("Message");
+                    b.Property<int>("ChatId")
+                        .HasColumnType("int");
 
-                    b.Navigation("User");
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("VoiceMessages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -514,18 +461,18 @@ namespace WebApplication1.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.ChatParticipant", b =>
+            modelBuilder.Entity("WebApplication1.Models.ChatMember", b =>
                 {
                     b.HasOne("WebApplication1.Models.Chat", "Chat")
-                        .WithMany("Participants")
-                        .HasForeignKey("ChatID")
+                        .WithMany("ChatMembers")
+                        .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebApplication1.Models.AppUser", "User")
-                        .WithMany("ChatParticipants")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany("ChatMembers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Chat");
@@ -535,109 +482,133 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("WebApplication1.Models.Contact", b =>
                 {
-                    b.HasOne("WebApplication1.Models.AppUser", "Friend")
+                    b.HasOne("WebApplication1.Models.AppUser", "ContactUser")
                         .WithMany()
-                        .HasForeignKey("FriendID")
+                        .HasForeignKey("ContactId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("WebApplication1.Models.AppUser", "User")
                         .WithMany("Contacts")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Friend");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.MediaFile", b =>
-                {
-                    b.HasOne("WebApplication1.Models.Chat", "Chat")
-                        .WithMany("MediaFiles")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("WebApplication1.Models.Message", "Message")
-                        .WithMany("MediaFiles")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("WebApplication1.Models.AppUser", "User")
-                        .WithMany("MediaFiles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Chat");
-
-                    b.Navigation("Message");
+                    b.Navigation("ContactUser");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.File", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Chat", "Chat")
+                        .WithMany("Files")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.AppUser", "Sender")
+                        .WithMany("Files")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Message", b =>
                 {
                     b.HasOne("WebApplication1.Models.Chat", "Chat")
                         .WithMany("Messages")
-                        .HasForeignKey("ChatID")
+                        .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebApplication1.Models.AppUser", "User")
+                    b.HasOne("WebApplication1.Models.AppUser", "Sender")
                         .WithMany("Messages")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Chat");
 
-                    b.Navigation("User");
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.VideoCall", b =>
                 {
-                    b.HasOne("WebApplication1.Models.AppUser", "Caller")
+                    b.HasOne("WebApplication1.Models.AppUser", "Callee")
                         .WithMany()
-                        .HasForeignKey("CallerID")
+                        .HasForeignKey("CalleeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WebApplication1.Models.AppUser", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverID")
+                    b.HasOne("WebApplication1.Models.AppUser", "Caller")
+                        .WithMany("VideoCalls")
+                        .HasForeignKey("CallerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.Chat", "Chat")
+                        .WithMany("VideoCalls")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Callee");
 
                     b.Navigation("Caller");
 
-                    b.Navigation("Receiver");
+                    b.Navigation("Chat");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.VoiceMessage", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Chat", "Chat")
+                        .WithMany("VoiceMessages")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.AppUser", "Sender")
+                        .WithMany("VoiceMessages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.AppUser", b =>
                 {
-                    b.Navigation("ChatParticipants");
+                    b.Navigation("ChatMembers");
 
                     b.Navigation("Contacts");
 
-                    b.Navigation("MediaFiles");
+                    b.Navigation("Files");
 
                     b.Navigation("Messages");
+
+                    b.Navigation("VideoCalls");
+
+                    b.Navigation("VoiceMessages");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Chat", b =>
                 {
-                    b.Navigation("MediaFiles");
+                    b.Navigation("ChatMembers");
+
+                    b.Navigation("Files");
 
                     b.Navigation("Messages");
 
-                    b.Navigation("Participants");
-                });
+                    b.Navigation("VideoCalls");
 
-            modelBuilder.Entity("WebApplication1.Models.Message", b =>
-                {
-                    b.Navigation("MediaFiles");
+                    b.Navigation("VoiceMessages");
                 });
 #pragma warning restore 612, 618
         }

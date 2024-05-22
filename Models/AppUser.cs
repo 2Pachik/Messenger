@@ -1,18 +1,21 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace WebApplication1.Models
 {
-    public class AppUser:IdentityUser
+    public class AppUser : IdentityUser
     {
         [StringLength(100)]
         [MaxLength(100)]
         [Required]
-        public string? Email { get; set; }
-        public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
-        public virtual ICollection<ChatParticipant> ChatParticipants { get; set; } = new List<ChatParticipant>();
-        public virtual ICollection<Contact> Contacts { get; set; } = new List<Contact>(); // Если у пользователя есть контакты
-        public virtual ICollection<MediaFile> MediaFiles { get; set; } = new List<MediaFile>(); // Если у пользователя есть контакты
+        public override string Email { get; set; } = null!;
 
+        public ICollection<Contact> Contacts { get; set; } = new List<Contact>();
+        public ICollection<ChatMember> ChatMembers { get; set; } = new List<ChatMember>();
+        public ICollection<Message> Messages { get; set; } = new List<Message>();
+        public ICollection<File> Files { get; set; } = new List<File>();
+        public ICollection<VoiceMessage> VoiceMessages { get; set; } = new List<VoiceMessage>();
+        public ICollection<VideoCall> VideoCalls { get; set; } = new List<VideoCall>();
     }
 }
