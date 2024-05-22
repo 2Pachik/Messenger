@@ -15,8 +15,9 @@ connection.on("LoadContacts", function (contacts) {
     receiverInput.innerHTML = ""; // Очищаем список
     contacts.forEach(function (contact) {
         var option = document.createElement("option");
-        option.text = contact; // Добавляем email контакта как текст опции
-        option.value = contact; // Добавляем email контакта как значение опции
+        option.text = contact.displayName; // Используем отображаемое имя
+        option.value = contact.email; // Используем email как значение опции
+        option.addEventListener("click", loadChatHistory); // Добавляем обработчик клика
         receiverInput.appendChild(option); // Добавляем опцию в список
     });
 });
@@ -26,17 +27,21 @@ connection.on("ChatHistory", function (messages) {
     messagesList.innerHTML = ""; // Очищаем список сообщений
     messages.forEach(function (message) {
         var li = document.createElement("li");
-        if (message.email == username) {
-            li.textContent = `You : ${message.content}`;
-        } else {
-            li.textContent = `${message.email} : ${message.content}`;
-        }
+        li.textContent = `${message.email} : ${message.content}`;
         messagesList.appendChild(li);
     });
 });
 
-connection.on("ContactAdded", function (email) {
-    alert(`Contact with email ${email} was added successfully`);
+connection.on("ContactAdded", function (contact) {
+    alert(`Contact with email ${contact.email} was added successfully`);
+    // Перезагрузим список контактов
+    connection.invoke("LoadContacts").catch(function (err) {
+        return console.error(err.toString());
+    });
+});
+
+connection.on("ContactUpdated", function (contact) {
+    alert(`Contact display name updated to ${contact.displayName}`);
     // Перезагрузим список контактов
     connection.invoke("LoadContacts").catch(function (err) {
         return console.error(err.toString());
@@ -84,4 +89,21 @@ document.getElementById("users").addEventListener("change", function (event) {
     connection.invoke("LoadChatHistory", contactEmail).catch(function (err) {
         return console.error(err.toString());
     });
+});
+
+function loadChatHistory(event) {
+    var contactEmail = event.target.value;
+    connection.invoke("LoadChatHistory", contactEmail).catch(function (err) {
+        return console.error(err.toString());
+    });
+}
+
+document.getElementById("updateDisplayNameButton").addEventListener("click", function (event) {
+    var newDisplayName = document.getElementById("newDisplayNameInput").value;
+    var contactEmail = document.getElementById("users").value;
+    connection.invoke("UpdateContactDisplayName", contactEmail, newDisplayName).catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    event.preventDefault();
 });

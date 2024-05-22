@@ -25,6 +25,16 @@
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("show").addEventListener("click", openDialog);
         document.querySelector("#dialog .close").addEventListener("click", closeDialog);
+        document.querySelector("#updateDialog .close").addEventListener("click", closeUpdateDialog);
+        document.getElementById("saveDisplayNameButton").addEventListener("click", function (event) {
+            var newDisplayName = document.getElementById("newDisplayNameDialogInput").value;
+            var contactEmail = document.getElementById("users").value;
+            connection.invoke("UpdateContactDisplayName", contactEmail, newDisplayName).catch(function (err) {
+                return console.error(err.toString());
+            });
+            closeUpdateDialog();
+            event.preventDefault();
+        });
     });
 
     function openDialog() {
@@ -36,10 +46,20 @@
         var dialog = document.getElementById("dialog");
         dialog.close();
     }
+
+    function openUpdateDialog() {
+        var dialog = document.getElementById("updateDialog");
+        dialog.showModal();
+    }
+
+    function closeUpdateDialog() {
+        var dialog = document.getElementById("updateDialog");
+        dialog.close();
+    }
 </script>
 
 
-<div class="container">
+<<div class="container">
     <div class="row p-1">
         <div class="col-1">Add friend</div>
         <div class="col-5"><button id="show">add</button></div>
@@ -71,14 +91,24 @@
         </div>
     </div>
 
+    <div class="row p-1">
+        <div class="col-1">New Display Name</div>
+        <div class="col-5"><input type="text" class="w-100" id="newDisplayNameInput" /></div>
+        <div class="col-1"><button id="updateDisplayNameButton">Update</button></div>
+    </div>
+
     <dialog id="dialog">
         <input type="text" id="contactEmailInput" placeholder="Email"></input>
         <button id="addContactButton">Add</button>
+        <button class="close">Close</button>
+    </dialog>
+
+    <dialog id="updateDialog">
+        <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name"></input>
+        <button id="saveDisplayNameButton">Save</button>
         <button class="close">Close</button>
     </dialog>
 </div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
-
-

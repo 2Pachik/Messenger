@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using WebApplication1.Models;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
+using WebApplication1.ViewModels;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
@@ -59,13 +60,18 @@ namespace WebApplication1.Hubs
             var newContact = new Contact
             {
                 UserId = user.Id,
-                ContactId = contact.Id
+                ContactId = contact.Id,
+                DisplayName = contact.Email // Устанавливаем первоначальное отображаемое имя как email
             };
 
             _context.Contacts.Add(newContact);
             await _context.SaveChangesAsync();
 
-            await Clients.Caller.SendAsync("ContactAdded", email);
+            await Clients.Caller.SendAsync("ContactAdded", new ContactVM
+            {
+                Email = contact.Email,
+                DisplayName = newContact.DisplayName
+            });
         }
 
         public async Task SendMessage(string receiverEmail, string message)
@@ -112,6 +118,7 @@ namespace WebApplication1.Hubs
 
             var chat = await _context.Chats
                 .Include(c => c.Messages)
+                .ThenInclude(m => m.Sender)
                 .FirstOrDefaultAsync(c =>
                     c.ChatMembers.Any(cm => cm.UserId == user.Id) &&
                     c.ChatMembers.Any(cm => cm.UserId == contact.Id));
@@ -151,10 +158,10 @@ namespace WebApplication1.Hubs
                 IsGroup = false,
                 Name = "Private", // Установим значение для личных чатов
                 ChatMembers = new List<ChatMember>
-                {
-                    new ChatMember { UserId = userId1 },
-                    new ChatMember { UserId = userId2 }
-                }
+            {
+                new ChatMember { UserId = userId1 },
+                new ChatMember { UserId = userId2 }
+            }
             };
 
             _context.Chats.Add(chat);
@@ -163,13 +170,45 @@ namespace WebApplication1.Hubs
             return chat;
         }
 
-        private async Task<List<string>> GetUserContacts(string userId)
+        private async Task<List<ContactVM>> GetUserContacts(string userId)
         {
             var contacts = await _context.Contacts
                 .Where(c => c.UserId == userId)
-                .Select(c => c.ContactUser.Email)
+                .Select(c => new ContactVM
+                {
+                    Email = c.ContactUser.Email,
+                    DisplayName = c.DisplayName
+                })
                 .ToListAsync();
             return contacts;
+        }
+
+        public async Task UpdateContactDisplayName(string contactEmail, string newDisplayName)
+        {
+            var userEmail = Context.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(userEmail);
+            var contact = await _userManager.FindByNameAsync(contactEmail);
+
+            if (user == null || contact == null)
+            {
+                await Clients.Caller.SendAsync("Error", "User or contact not found");
+                return;
+            }
+
+            var existingContact = await _context.Contacts
+                .FirstOrDefaultAsync(c => c.UserId == user.Id && c.ContactId == contact.Id);
+
+            if (existingContact != null)
+            {
+                existingContact.DisplayName = newDisplayName;
+                _context.Contacts.Update(existingContact);
+                await _context.SaveChangesAsync();
+                await Clients.Caller.SendAsync("ContactUpdated", new ContactVM
+                {
+                    Email = contactEmail,
+                    DisplayName = newDisplayName
+                });
+            }
         }
     }
 }
