@@ -16,7 +16,22 @@ connection.on("LoadContacts", function (contacts) {
     contacts.forEach(function (contact) {
         var option = document.createElement("option");
         option.text = contact; // Добавляем email контакта как текст опции
+        option.value = contact; // Добавляем email контакта как значение опции
         receiverInput.appendChild(option); // Добавляем опцию в список
+    });
+});
+
+connection.on("ChatHistory", function (messages) {
+    var messagesList = document.getElementById("messagesList");
+    messagesList.innerHTML = ""; // Очищаем список сообщений
+    messages.forEach(function (message) {
+        var li = document.createElement("li");
+        if (message.email == username) {
+            li.textContent = `You : ${message.content}`;
+        } else {
+            li.textContent = `${message.email} : ${message.content}`;
+        }
+        messagesList.appendChild(li);
     });
 });
 
@@ -62,4 +77,11 @@ document.getElementById("addContactButton").addEventListener("click", function (
     });
 
     event.preventDefault();
+});
+
+document.getElementById("users").addEventListener("change", function (event) {
+    var contactEmail = event.target.value;
+    connection.invoke("LoadChatHistory", contactEmail).catch(function (err) {
+        return console.error(err.toString());
+    });
 });

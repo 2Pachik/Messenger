@@ -211,7 +211,7 @@ namespace WebApplication1.Controllers
                 await _userManager.UpdateAsync(user);
             }
 
-            return RedirectToLocal(nameof(Settings));
+            return RedirectToAction(nameof(Settings));
         }
 
         [HttpPost]

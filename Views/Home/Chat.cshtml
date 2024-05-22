@@ -5,27 +5,19 @@
 </script>
 
 <script>
-    // Функция для поиска пользователей
-    function searchUsers() {
-        // Получаем значение поискового запроса
-        var searchValue = document.getElementById("searchInput").value.toLowerCase();
-        // Получаем список всех пользователей в селекте
-        var usersSelect = document.getElementById("users");
-        var options = usersSelect.getElementsByTagName("option");
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("show").addEventListener("click", openDialog);
+        document.querySelector("#dialog .close").addEventListener("click", closeDialog);
+    });
 
-        // Перебираем все опции в селекте
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            var username = option.textContent.toLowerCase();
-            // Проверяем, содержит ли имя пользователя поисковой запрос
-            if (username.indexOf(searchValue) !== -1) {
-                // Если содержит, то показываем этого пользователя
-                option.style.display = "block";
-            } else {
-                // Если не содержит, то скрываем этого пользователя
-                option.style.display = "none";
-            }
-        }
+    function openDialog() {
+        var dialog = document.getElementById("dialog");
+        dialog.showModal();
+    }
+
+    function closeDialog() {
+        var dialog = document.getElementById("dialog");
+        dialog.close();
     }
 </script>
 
@@ -88,4 +80,5 @@
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
+
 
