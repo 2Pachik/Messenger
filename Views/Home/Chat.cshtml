@@ -6,6 +6,12 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Обработчик для включения/выключения кнопки отправки
+        document.getElementById("messageInput").addEventListener("input", function () {
+            var message = document.getElementById("messageInput").value.trim();
+            document.getElementById("sendButton").disabled = message === "";
+        });
+
         document.getElementById("show").addEventListener("click", openDialog);
         document.getElementById("updateShow").addEventListener("click", openUpdateDialog); // Обработчик для открытия диалогового окна изменения имени
         document.querySelector("#dialog .close").addEventListener("click", closeDialog);
@@ -74,8 +80,25 @@
         padding: 10px 0;
     }
 
+    #sendButton {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 10px;
+        padding: 10px;
+        border-radius: 50%;
+        border: none;
+        outline: none;
+        color: white;
+        background-color: #1751d0;
+    }
+
+        #sendButton i {
+            font-size: 24px; /* Adjust the icon size if needed */
+        }
+
     ul#messagesList {
-        padding-left: 0; /* Add this to remove the default padding */
+        padding-left: 0;
     }
 </style>
 
@@ -103,7 +126,7 @@
                 </div>
                 <div class="row p-1">
                     <div class="col-6 text-end">
-                        <input type="button" id="sendButton" value="Send Message" />
+                        <button type="button" id="sendButton"><i class="material-icons">send</i></button>
                     </div>
                 </div>
             </div>
