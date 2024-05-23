@@ -129,15 +129,27 @@ namespace WebApplication1.Hubs
                 return;
             }
 
+            // Получаем DisplayName из таблицы Contact
+            var userContact = await _context.Contacts
+                .FirstOrDefaultAsync(c => c.UserId == user.Id && c.ContactId == contact.Id);
+
+            if (userContact == null)
+            {
+                await Clients.Caller.SendAsync("Error", "Contact not found in user contacts");
+                return;
+            }
+
             var messages = chat.Messages.OrderBy(m => m.SentAt).Select(m => new
             {
                 Email = m.Sender.Email,
+                DisplayName = m.SenderId == user.Id ? "You" : userContact.DisplayName, // Если отправитель - текущий пользователь, используем "You", иначе DisplayName из Contact
                 Content = m.Content,
                 SentAt = m.SentAt
             }).ToList();
 
             await Clients.Caller.SendAsync("ChatHistory", messages);
         }
+
 
         private async Task<Chat> GetOrCreateChat(string userId1, string userId2)
         {

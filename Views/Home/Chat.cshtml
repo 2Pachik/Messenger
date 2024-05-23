@@ -44,49 +44,83 @@
     }
 </script>
 
+<style>
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        height: 85vh;
+    }
+
+    .test {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow: hidden;
+    }
+
+    .content {
+        overflow-y: auto;
+        height: calc(100% - 140px);
+    }
+
+    .input-container {
+        flex-shrink: 0;
+        background-color: #f8f9fa;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    ul#messagesList {
+        padding-left: 0; /* Add this to remove the default padding */
+    }
+</style>
+
 <div class="container">
-    <div class="row p-1">
-        <div class="col-1">Add friend</div>
-        <div class="col-5"><button id="show">add</button></div>
-    </div>
-    <div class="row p-1">
-        <div class="col-1">Receiver</div>
-        <div class="col-5">
-            <select id="users" class="w-100"></select>
-        </div>
-        <div class="col-1"><button id="updateShow">edit name</button></div>
-    </div>
-    <div class="row p-1">
-        <div class="col-6">
-            <ul id="messagesList"></ul>
-        </div>
-    </div>
-    <div class="row p-1">
-        <div class="col-6">
-            <hr />
-        </div>
-    </div>
-    <div class="row p-1">
-        <div class="col-1">Message</div>
-        <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
-    </div>
-    <div class="row p-1">
-        <div class="col-6 text-end">
-            <input type="button" id="sendButton" value="Send Message" />
-        </div>
-    </div>
+    <div class="main-container">
+        <div class="test">
+            <div class="row p-1">
+                <div class="col-1">Add friend</div>
+                <div class="col-5"><button id="show">add</button></div>
+            </div>
+            <div class="row p-1">
+                <div class="col-1">Receiver</div>
+                <div class="col-5">
+                    <select id="users" class="w-100" onchange="loadChatHistory()"></select>
+                </div>
+                <div class="col-1"><button id="updateShow">edit name</button></div>
+            </div>
+            <div class="content">
+                <ul id="messagesList"></ul>
+            </div>
+            <div class="input-container">
+                <div class="row p-1">
+                    <div class="col-1">Message</div>
+                    <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
+                </div>
+                <div class="row p-1">
+                    <div class="col-6 text-end">
+                        <input type="button" id="sendButton" value="Send Message" />
+                    </div>
+                </div>
+            </div>
 
-    <dialog id="dialog">
-        <input type="text" id="contactEmailInput" placeholder="Email"></input>
-        <button id="addContactButton">Add</button>
-        <button class="close">Close</button>
-    </dialog>
+            <dialog id="dialog">
+                <input type="text" id="contactEmailInput" placeholder="Email"></input>
+                <button id="addContactButton">Add</button>
+                <button class="close">Close</button>
+            </dialog>
 
-    <dialog id="updateDialog">
-        <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name"></input>
-        <button id="saveDisplayNameButton">Save</button>
-        <button class="close">Close</button>
-    </dialog>
+            <dialog id="updateDialog">
+                <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name"></input>
+                <button id="saveDisplayNameButton">Save</button>
+                <button class="close">Close</button>
+            </dialog>
+        </div>
+    </div>
 </div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
