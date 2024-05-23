@@ -64,9 +64,7 @@ document.getElementById("sendButton").addEventListener("click", function (event)
     var message = document.getElementById("messageInput").value;
     var receiverEmail = document.getElementById("users").value; // Получаем email получателя
 
-    var li = document.createElement("li");
-    document.getElementById("messagesList").appendChild(li);
-    li.textContent = `You : ${message}`;
+    // Убираем добавление сообщения здесь
 
     connection.invoke("SendMessage", receiverEmail, message).catch(function (err) {
         return console.error(err.toString());
@@ -97,13 +95,3 @@ function loadChatHistory(event) {
         return console.error(err.toString());
     });
 }
-
-document.getElementById("updateDisplayNameButton").addEventListener("click", function (event) {
-    var newDisplayName = document.getElementById("newDisplayNameInput").value;
-    var contactEmail = document.getElementById("users").value;
-    connection.invoke("UpdateContactDisplayName", contactEmail, newDisplayName).catch(function (err) {
-        return console.error(err.toString());
-    });
-
-    event.preventDefault();
-});

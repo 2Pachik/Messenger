@@ -7,23 +7,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("show").addEventListener("click", openDialog);
-        document.querySelector("#dialog .close").addEventListener("click", closeDialog);
-    });
-
-    function openDialog() {
-        var dialog = document.getElementById("dialog");
-        dialog.showModal();
-    }
-
-    function closeDialog() {
-        var dialog = document.getElementById("dialog");
-        dialog.close();
-    }
-</script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("show").addEventListener("click", openDialog);
+        document.getElementById("updateShow").addEventListener("click", openUpdateDialog); // Обработчик для открытия диалогового окна изменения имени
         document.querySelector("#dialog .close").addEventListener("click", closeDialog);
         document.querySelector("#updateDialog .close").addEventListener("click", closeUpdateDialog);
         document.getElementById("saveDisplayNameButton").addEventListener("click", function (event) {
@@ -49,6 +33,8 @@
 
     function openUpdateDialog() {
         var dialog = document.getElementById("updateDialog");
+        var contactEmail = document.getElementById("users").value;
+        document.getElementById("newDisplayNameDialogInput").value = contactEmail; // Устанавливаем текущее имя в поле ввода
         dialog.showModal();
     }
 
@@ -58,8 +44,7 @@
     }
 </script>
 
-
-<<div class="container">
+<div class="container">
     <div class="row p-1">
         <div class="col-1">Add friend</div>
         <div class="col-5"><button id="show">add</button></div>
@@ -67,8 +52,18 @@
     <div class="row p-1">
         <div class="col-1">Receiver</div>
         <div class="col-5">
-            <input type="text" class="w-100" id="searchInput" oninput="searchUsers()" placeholder="Search contacts">
             <select id="users" class="w-100"></select>
+        </div>
+        <div class="col-1"><button id="updateShow">edit name</button></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <ul id="messagesList"></ul>
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <hr />
         </div>
     </div>
     <div class="row p-1">
@@ -79,22 +74,6 @@
         <div class="col-6 text-end">
             <input type="button" id="sendButton" value="Send Message" />
         </div>
-    </div>
-    <div class="row p-1">
-        <div class="col-6">
-            <hr />
-        </div>
-    </div>
-    <div class="row p-1">
-        <div class="col-6">
-            <ul id="messagesList"></ul>
-        </div>
-    </div>
-
-    <div class="row p-1">
-        <div class="col-1">New Display Name</div>
-        <div class="col-5"><input type="text" class="w-100" id="newDisplayNameInput" /></div>
-        <div class="col-1"><button id="updateDisplayNameButton">Update</button></div>
     </div>
 
     <dialog id="dialog">
