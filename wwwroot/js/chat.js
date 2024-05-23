@@ -2,8 +2,6 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
-document.getElementById("sendButton").disabled = true;
-
 connection.on("ReceiveMessage", function (user, message) {
     var li = document.createElement("li");
     li.style.listStyleType = "none";  // Add this line to remove the dot
@@ -49,9 +47,7 @@ connection.on("Error", function (message) {
     alert(`Error: ${message}`);
 });
 
-connection.start().then(function () {
-    document.getElementById("sendButton").disabled = false;
-}).catch(function (err) {
+connection.start().catch(function (err) {
     return console.error(err.toString());
 });
 

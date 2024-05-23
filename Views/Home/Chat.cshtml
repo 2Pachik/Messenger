@@ -6,6 +6,9 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Отключаем кнопку отправки при загрузке страницы
+        document.getElementById("sendButton").disabled = true;
+
         // Обработчик для включения/выключения кнопки отправки
         document.getElementById("messageInput").addEventListener("input", function () {
             var message = document.getElementById("messageInput").value.trim();
@@ -91,7 +94,18 @@
         outline: none;
         color: white;
         background-color: #1751d0;
+        cursor: pointer;
+        transition: background-color 0.3s;
     }
+
+        #sendButton:disabled {
+            cursor: not-allowed;
+            background-color: #999999;
+        }
+
+        #sendButton:hover:enabled {
+            background-color: #0d3ea9;
+        }
 
         #sendButton i {
             font-size: 24px; /* Adjust the icon size if needed */
