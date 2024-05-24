@@ -4,7 +4,7 @@
     var username = "@User.Identity!.Name";
 </script>
 
-<script>
+@* <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Отключаем кнопку отправки при загрузке страницы
         document.getElementById("sendButton").disabled = true;
@@ -27,6 +27,30 @@
             });
             closeUpdateDialog();
             event.preventDefault();
+        });
+
+        document.getElementById("fileInput").addEventListener("change", function (event) {
+            var file = event.target.files[0];
+            if (file) {
+                var receiverEmail = document.getElementById("users").value;
+                var formData = new FormData();
+                formData.append("file", file);
+                formData.append("receiverEmail", receiverEmail);
+
+                fetch("/upload", {
+                    method: "POST",
+                    body: formData
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("File sent successfully");
+                        } else {
+                            alert("Error sending file: " + data.error);
+                        }
+                    }).catch(error => {
+                        console.error("Error uploading file:", error);
+                    });
+            }
         });
     });
 
@@ -51,13 +75,41 @@
         var dialog = document.getElementById("updateDialog");
         dialog.close();
     }
-</script>
+</script> *@
 
 <style>
     .main-container {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         height: 85vh;
+    }
+
+    .contacts-container {
+        width: 200px;
+        border-right: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .contact-button {
+        background-color: #f8f9fa;
+        border: none;
+        padding: 10px;
+        margin: 5px 0;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .contact-button:hover {
+            background-color: #ddd;
+        }
+
+    .active-contact {
+        background-color: #007bff;
+        color: white;
     }
 
     .test {
@@ -83,7 +135,7 @@
         padding: 10px 0;
     }
 
-    #sendButton {
+    #sendButton, #uploadButton {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -98,38 +150,49 @@
         transition: background-color 0.3s;
     }
 
-        #sendButton:disabled {
+        #sendButton:disabled, #uploadButton:disabled {
             cursor: not-allowed;
             background-color: #999999;
         }
 
-        #sendButton:hover:enabled {
+        #sendButton:hover:enabled, #uploadButton:hover:enabled {
             background-color: #0d3ea9;
         }
 
-        #sendButton i {
+        #sendButton i, #uploadButton i {
             font-size: 24px; /* Adjust the icon size if needed */
         }
 
     ul#messagesList {
         padding-left: 0;
     }
+
+    #fileInput {
+        display: none;
+    }
+
+    dialog {
+        border: solid 1px #ccc;
+        padding: 20px;
+    }
+
+        dialog .close {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            float: right;
+        }
 </style>
 
 <div class="container">
     <div class="main-container">
+        <div class="contacts-container" id="contactsContainer">
+            <button id="show">Add friend</button>
+            <!-- Контакты будут добавляться динамически -->
+        </div>
         <div class="test">
-            <div class="row p-1">
-                <div class="col-1">Add friend</div>
-                <div class="col-5"><button id="show">add</button></div>
-            </div>
-            <div class="row p-1">
-                <div class="col-1">Receiver</div>
-                <div class="col-5">
-                    <select id="users" class="w-100" onchange="loadChatHistory()"></select>
-                </div>
-                <div class="col-1"><button id="updateShow">edit name</button></div>
-            </div>
             <div class="content">
                 <ul id="messagesList"></ul>
             </div>
@@ -140,11 +203,12 @@
                 </div>
                 <div class="row p-1">
                     <div class="col-6 text-end">
+                        <input type="file" id="fileInput" />
+                        <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
                         <button type="button" id="sendButton"><i class="material-icons">send</i></button>
                     </div>
                 </div>
             </div>
-
             <dialog id="dialog">
                 <input type="text" id="contactEmailInput" placeholder="Email"></input>
                 <button id="addContactButton">Add</button>
@@ -154,11 +218,13 @@
             <dialog id="updateDialog">
                 <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name"></input>
                 <button id="saveDisplayNameButton">Save</button>
-                <button class="close">Close</button>
+                <button class="close"><i class="material-icons">close</i></button>
             </dialog>
         </div>
     </div>
 </div>
 
+
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
+
