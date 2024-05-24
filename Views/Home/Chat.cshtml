@@ -4,79 +4,6 @@
     var username = "@User.Identity!.Name";
 </script>
 
-@* <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Отключаем кнопку отправки при загрузке страницы
-        document.getElementById("sendButton").disabled = true;
-
-        // Обработчик для включения/выключения кнопки отправки
-        document.getElementById("messageInput").addEventListener("input", function () {
-            var message = document.getElementById("messageInput").value.trim();
-            document.getElementById("sendButton").disabled = message === "";
-        });
-
-        document.getElementById("show").addEventListener("click", openDialog);
-        document.getElementById("updateShow").addEventListener("click", openUpdateDialog); // Обработчик для открытия диалогового окна изменения имени
-        document.querySelector("#dialog .close").addEventListener("click", closeDialog);
-        document.querySelector("#updateDialog .close").addEventListener("click", closeUpdateDialog);
-        document.getElementById("saveDisplayNameButton").addEventListener("click", function (event) {
-            var newDisplayName = document.getElementById("newDisplayNameDialogInput").value;
-            var contactEmail = document.getElementById("users").value;
-            connection.invoke("UpdateContactDisplayName", contactEmail, newDisplayName).catch(function (err) {
-                return console.error(err.toString());
-            });
-            closeUpdateDialog();
-            event.preventDefault();
-        });
-
-        document.getElementById("fileInput").addEventListener("change", function (event) {
-            var file = event.target.files[0];
-            if (file) {
-                var receiverEmail = document.getElementById("users").value;
-                var formData = new FormData();
-                formData.append("file", file);
-                formData.append("receiverEmail", receiverEmail);
-
-                fetch("/upload", {
-                    method: "POST",
-                    body: formData
-                }).then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert("File sent successfully");
-                        } else {
-                            alert("Error sending file: " + data.error);
-                        }
-                    }).catch(error => {
-                        console.error("Error uploading file:", error);
-                    });
-            }
-        });
-    });
-
-    function openDialog() {
-        var dialog = document.getElementById("dialog");
-        dialog.showModal();
-    }
-
-    function closeDialog() {
-        var dialog = document.getElementById("dialog");
-        dialog.close();
-    }
-
-    function openUpdateDialog() {
-        var dialog = document.getElementById("updateDialog");
-        var contactEmail = document.getElementById("users").value;
-        document.getElementById("newDisplayNameDialogInput").value = contactEmail; // Устанавливаем текущее имя в поле ввода
-        dialog.showModal();
-    }
-
-    function closeUpdateDialog() {
-        var dialog = document.getElementById("updateDialog");
-        dialog.close();
-    }
-</script> *@
-
 <style>
     .main-container {
         display: flex;
@@ -139,7 +66,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-left: 10px;
         padding: 10px;
         border-radius: 50%;
         border: none;
@@ -148,6 +74,14 @@
         background-color: #1751d0;
         cursor: pointer;
         transition: background-color 0.3s;
+    }
+
+    #uploadButton {
+        margin-right: 10px;
+    }
+
+    #sendButton {
+        margin-left: 10px;
     }
 
         #sendButton:disabled, #uploadButton:disabled {
@@ -176,21 +110,16 @@
         padding: 20px;
     }
 
-        dialog .close {
-            background: #d9534f;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            float: right;
-        }
+    .inputMsg {
+        display: flex;
+        width: 100%;
+    }
 </style>
 
 <div class="container">
     <div class="main-container">
         <div class="contacts-container" id="contactsContainer">
-            <button id="show">Add friend</button>
-            <!-- Контакты будут добавляться динамически -->
+            <button id="show"><i class="material-icons">add</i></button>
         </div>
         <div class="test">
             <div class="content">
@@ -198,26 +127,23 @@
             </div>
             <div class="input-container">
                 <div class="row p-1">
-                    <div class="col-1">Message</div>
-                    <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
-                </div>
-                <div class="row p-1">
-                    <div class="col-6 text-end">
+                    <div class="col-6 text-end inputMsg">
                         <input type="file" id="fileInput" />
                         <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
+                        <input type="text" class="w-100" id="messageInput" placeholder="Type something" />
                         <button type="button" id="sendButton"><i class="material-icons">send</i></button>
                     </div>
                 </div>
             </div>
             <dialog id="dialog">
                 <input type="text" id="contactEmailInput" placeholder="Email"></input>
-                <button id="addContactButton">Add</button>
-                <button class="close">Close</button>
+                <button id="addContactButton"><i class="material-icons">add</i></button>
+                <button class="close"><i class="material-icons">close</i></button>
             </dialog>
 
             <dialog id="updateDialog">
                 <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name"></input>
-                <button id="saveDisplayNameButton">Save</button>
+                <button id="saveDisplayNameButton"><i class="material-icons">save</i></button>
                 <button class="close"><i class="material-icons">close</i></button>
             </dialog>
         </div>
@@ -227,4 +153,3 @@
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
-

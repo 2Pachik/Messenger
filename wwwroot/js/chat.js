@@ -25,7 +25,7 @@ connection.on("ReceiveFile", function (user, filePath) {
 
 connection.on("LoadContacts", function (contacts) {
     var contactsContainer = document.getElementById("contactsContainer");
-    contactsContainer.innerHTML = '<button id="show">Add friend</button>';
+    contactsContainer.innerHTML = '<button id="show"><i class="material-icons">add  </i></button>';
     document.getElementById("show").addEventListener("click", openDialog);
     contacts.forEach(function (contact) {
         var button = document.createElement("button");
