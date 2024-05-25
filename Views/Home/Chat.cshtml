@@ -66,6 +66,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        margin-left: 10px;
         padding: 10px;
         border-radius: 50%;
         border: none;
@@ -74,14 +75,6 @@
         background-color: #1751d0;
         cursor: pointer;
         transition: background-color 0.3s;
-    }
-
-    #uploadButton {
-        margin-right: 10px;
-    }
-
-    #sendButton {
-        margin-left: 10px;
     }
 
         #sendButton:disabled, #uploadButton:disabled {
@@ -110,45 +103,82 @@
         padding: 20px;
     }
 
-    .inputMsg {
+        dialog .close {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            float: right;
+        }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .message-container {
         display: flex;
-        width: 100%;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .message-image {
+        max-width: 200px;
+        max-height: 200px;
+        margin-left: 10px;
     }
 </style>
 
-<div class="container">
-    <div class="main-container">
-        <div class="contacts-container" id="contactsContainer">
-            <button id="show"><i class="material-icons">add</i></button>
-        </div>
-        <div class="test">
-            <div class="content">
-                <ul id="messagesList"></ul>
-            </div>
-            <div class="input-container">
-                <div class="row p-1">
-                    <div class="col-6 text-end inputMsg">
-                        <input type="file" id="fileInput" />
-                        <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
-                        <input type="text" class="w-100" id="messageInput" placeholder="Type something" />
-                        <button type="button" id="sendButton"><i class="material-icons">send</i></button>
-                    </div>
+
+    <div class="container">
+        <div class="main-container">
+            <div style="display: flex; flex-direction:column;">
+                <button onclick="openAvatarDialog()">Change Avatar</button>
+                <div class="contacts-container" id="contactsContainer">
+                    <button id="show">Add friend</button>
+                    <!-- Контакты будут добавляться динамически -->
                 </div>
             </div>
-            <dialog id="dialog">
-                <input type="text" id="contactEmailInput" placeholder="Email"></input>
-                <button id="addContactButton"><i class="material-icons">add</i></button>
-                <button class="close"><i class="material-icons">close</i></button>
-            </dialog>
+            <div class="test">
+                <div class="content">
+                    <ul id="messagesList"></ul>
+                </div>
+                <div class="input-container">
+                    <div class="row p-1">
+                        <div class="col-1">Message</div>
+                        <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
+                    </div>
+                    <div class="row p-1">
+                        <div class="col-6 text-end">
+                            <input type="file" id="fileInput" />
+                            <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
+                            <button type="button" id="sendButton" disabled><i class="material-icons">send</i></button>
+                        </div>
+                    </div>
+                </div>
+                <dialog id="dialog">
+                    <input type="text" id="contactEmailInput" placeholder="Email"></input>
+                    <button id="addContactButton">Add</button>
+                    <button class="close">Close</button>
+                </dialog>
 
-            <dialog id="updateDialog">
-                <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name"></input>
-                <button id="saveDisplayNameButton"><i class="material-icons">save</i></button>
-                <button class="close"><i class="material-icons">close</i></button>
-            </dialog>
+                <dialog id="updateDialog">
+                    <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name"></input>
+                    <button id="saveDisplayNameButton">Save</button>
+                    <button class="close">Close</button>
+                </dialog>
+
+                <dialog id="updateAvatarDialog">
+                    <input type="file" id="avatarInput" accept="image/*" />
+                    <button id="saveAvatarButton">Save</button>
+                    <button class="close">Close</button>
+                </dialog>
+            </div>
         </div>
     </div>
-</div>
 
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>

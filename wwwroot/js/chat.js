@@ -5,27 +5,61 @@ var activeContactButton = null;
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
-connection.on("ReceiveMessage", function (user, message) {
+connection.on("ReceiveMessage", function (user, message, avatar) {
     var li = document.createElement("li");
     li.style.listStyleType = "none";  // Add this line to remove the dot
+    var container = document.createElement("div");
+    container.classList.add("message-container");
+
+    var img = document.createElement("img");
+    img.src = avatar;
+    img.classList.add("avatar");
+
+    var text = document.createElement("span");
+    text.textContent = `${user} : ${message}`;
+
+    container.appendChild(img);
+    container.appendChild(text);
+
+    li.appendChild(container);
     document.getElementById("messagesList").appendChild(li);
-    li.textContent = `${user} : ${message}`;
 });
 
-connection.on("ReceiveFile", function (user, filePath) {
+connection.on("ReceiveFile", function (user, filePath, avatar) {
     var li = document.createElement("li");
     li.style.listStyleType = "none";
-    var link = document.createElement("a");
-    link.href = filePath;
-    link.textContent = `${user} sent a file: ${filePath.split('/').pop()}`;
-    link.target = "_blank";
-    li.appendChild(link);
+    var container = document.createElement("div");
+    container.classList.add("message-container");
+
+    var img = document.createElement("img");
+    img.src = avatar;
+    img.classList.add("avatar");
+
+    var fileExtension = filePath.split('.').pop().toLowerCase();
+    var isImage = ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(fileExtension);
+
+    if (isImage) {
+        var image = document.createElement("img");
+        image.src = filePath;
+        image.classList.add("message-image");
+        container.appendChild(img);
+        container.appendChild(image);
+    } else {
+        var link = document.createElement("a");
+        link.href = filePath;
+        link.textContent = `${user} sent a file: ${filePath.split('/').pop()}`;
+        link.target = "_blank";
+        container.appendChild(img);
+        container.appendChild(link);
+    }
+
+    li.appendChild(container);
     document.getElementById("messagesList").appendChild(li);
 });
 
 connection.on("LoadContacts", function (contacts) {
     var contactsContainer = document.getElementById("contactsContainer");
-    contactsContainer.innerHTML = '<button id="show"><i class="material-icons">add  </i></button>';
+    contactsContainer.innerHTML = '<button id="show">Add friend</button>';
     document.getElementById("show").addEventListener("click", openDialog);
     contacts.forEach(function (contact) {
         var button = document.createElement("button");
@@ -50,19 +84,43 @@ connection.on("ChatHistory", function (messages) {
     messages.forEach(function (message) {
         var li = document.createElement("li");
         li.style.listStyleType = "none";  // Add this line to remove the dot
+        var container = document.createElement("div");
+        container.classList.add("message-container");
+
+        var img = document.createElement("img");
+        img.src = message.avatar;
+        img.classList.add("avatar");
+
         if (message.messageType === "text") {
+            var text = document.createElement("span");
             if (message.email === username) {
-                li.textContent = `You : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                text.textContent = `You : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
             } else {
-                li.textContent = `${message.displayName} : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                text.textContent = `${message.displayName} : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
             }
+            container.appendChild(img);
+            container.appendChild(text);
         } else if (message.messageType === "file") {
-            var link = document.createElement("a");
-            link.href = message.content;
-            link.textContent = `${message.displayName} sent a file: ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
-            link.target = "_blank";
-            li.appendChild(link);
+            var fileExtension = message.content.split('.').pop().toLowerCase();
+            var isImage = ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(fileExtension);
+
+            if (isImage) {
+                var image = document.createElement("img");
+                image.src = message.content;
+                image.classList.add("message-image");
+                container.appendChild(img);
+                container.appendChild(image);
+            } else {
+                var link = document.createElement("a");
+                link.href = message.content;
+                link.textContent = `${message.displayName} sent a file: ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                link.target = "_blank";
+                container.appendChild(img);
+                container.appendChild(link);
+            }
         }
+
+        li.appendChild(container);
         messagesList.appendChild(li);
     });
 });
@@ -84,12 +142,16 @@ connection.start().catch(function (err) {
 });
 
 document.getElementById("sendButton").addEventListener("click", function (event) {
-    var message = document.getElementById("messageInput").value;
+    var message = document.getElementById("messageInput").value.trim();
+    if (message === "") {
+        return; // Prevent sending empty messages
+    }
     if (currentReceiverEmail) {
         connection.invoke("SendMessage", currentReceiverEmail, message).catch(function (err) {
             return console.error(err.toString());
         });
         document.getElementById("messageInput").value = ""; // Clear the input
+        document.getElementById("sendButton").disabled = true; // Disable the send button
     } else {
         alert("Please select a contact first.");
     }
@@ -170,13 +232,39 @@ function closeUpdateDialog() {
     dialog.close();
 }
 
-document.getElementById("saveDisplayNameButton").addEventListener("click", function (event) {
-    var newDisplayName = document.getElementById("newDisplayNameDialogInput").value;
-    var contactEmail = document.getElementById("updateDialog").getAttribute("data-email");
-    connection.invoke("UpdateContactDisplayName", contactEmail, newDisplayName).catch(function (err) {
-        return console.error(err.toString());
-    });
-    closeUpdateDialog();
+function openAvatarDialog() {
+    var dialog = document.getElementById("updateAvatarDialog");
+    dialog.showModal();
+}
+
+function closeAvatarDialog() {
+    var dialog = document.getElementById("updateAvatarDialog");
+    dialog.close();
+}
+
+document.getElementById("saveAvatarButton").addEventListener("click", function (event) {
+    var avatarInput = document.getElementById("avatarInput");
+    var file = avatarInput.files[0];
+    if (file) {
+        var formData = new FormData();
+        formData.append("avatar", file);
+
+        fetch("/upload/avatar", {
+            method: "POST",
+            body: formData
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Avatar updated successfully");
+                    // Optionally, reload or update the avatar in the UI
+                } else {
+                    alert("Error updating avatar: " + data.error);
+                }
+            }).catch(error => {
+                console.error("Error uploading avatar:", error);
+            });
+    }
+    closeAvatarDialog();
     event.preventDefault();
 });
 
@@ -192,4 +280,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelector("#dialog .close").addEventListener("click", closeDialog);
     document.querySelector("#updateDialog .close").addEventListener("click", closeUpdateDialog);
+    document.querySelector("#updateAvatarDialog .close").addEventListener("click", closeAvatarDialog);
+});
+
+document.addEventListener("contextmenu", function (event) {
+    if (event.target.classList.contains("contact-button")) {
+        event.preventDefault();
+        openUpdateDialog(event.target.getAttribute("data-email"));
+    }
 });

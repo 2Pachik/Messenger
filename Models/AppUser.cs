@@ -10,6 +10,7 @@ namespace WebApplication1.Models
         [MaxLength(100)]
         [Required]
         public override string Email { get; set; } = null!;
+        public string? AvatarPath { get; set; }
 
         public ICollection<Contact> Contacts { get; set; } = new List<Contact>();
         public ICollection<ChatMember> ChatMembers { get; set; } = new List<ChatMember>();

@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\resources\" />
-    <Folder Include="wwwroot\uploads\" />
+    <Folder Include="wwwroot\uploads\avatars\" />
   </ItemGroup>
 
 </Project>

@@ -79,14 +79,14 @@ namespace WebApplication1.Controllers
                 SenderId = user.Id,
                 Content = relativeFilePath,
                 SentAt = DateTime.UtcNow,
-                MessageType = "file"
+                MessageType = "file",
             };
 
             _context.Messages.Add(newMessage);
             await _context.SaveChangesAsync();
 
-            await _hubContext.Clients.User(receiver.Id).SendAsync("ReceiveFile", user.Email, relativeFilePath);
-            await _hubContext.Clients.User(user.Id).SendAsync("ReceiveFile", "You", relativeFilePath);
+            await _hubContext.Clients.User(receiver.Id).SendAsync("ReceiveFile", user.Email, relativeFilePath, user.AvatarPath);
+            await _hubContext.Clients.User(user.Id).SendAsync("ReceiveFile", "You", relativeFilePath, user.AvatarPath);
             return Ok(new { success = true });
         }
 

@@ -100,8 +100,10 @@ namespace WebApplication1.Hubs
             _context.Messages.Add(newMessage);
             await _context.SaveChangesAsync();
 
-            await Clients.User(receiver.Id).SendAsync("ReceiveMessage", sender.Email, message);
-            await Clients.Caller.SendAsync("ReceiveMessage", "You", message);
+            var senderAvatar = sender.AvatarPath;
+
+            await Clients.User(receiver.Id).SendAsync("ReceiveMessage", sender.Email, message, senderAvatar);
+            await Clients.Caller.SendAsync("ReceiveMessage", "You", message, senderAvatar);
         }
 
         public async Task LoadChatHistory(string contactEmail)
@@ -129,22 +131,14 @@ namespace WebApplication1.Hubs
                 return;
             }
 
-            var userContact = await _context.Contacts
-                .FirstOrDefaultAsync(c => c.UserId == user.Id && c.ContactId == contact.Id);
-
-            if (userContact == null)
-            {
-                await Clients.Caller.SendAsync("Error", "Contact not found in user contacts");
-                return;
-            }
-
             var messages = chat.Messages.OrderBy(m => m.SentAt).Select(m => new
             {
                 Email = m.Sender.Email,
-                DisplayName = m.SenderId == user.Id ? "You" : userContact.DisplayName,
+                DisplayName = m.SenderId == user.Id ? "You" : m.Sender.Email,
                 Content = m.Content,
                 SentAt = m.SentAt,
-                MessageType = m.MessageType
+                MessageType = m.MessageType,
+                Avatar = m.Sender.AvatarPath
             }).ToList();
 
             await Clients.Caller.SendAsync("ChatHistory", messages);
