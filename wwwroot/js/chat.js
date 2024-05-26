@@ -134,7 +134,7 @@ connection.on("ChatHistory", function (messages) {
             } else {
                 var link = document.createElement("a");
                 link.href = message.content;
-                link.textContent = `${message.displayName} sent a file: ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                link.textContent = `${message.displayName} : ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
                 link.target = "_blank";
                 link.classList.add("message-file");
                 container.appendChild(img);
@@ -244,7 +244,7 @@ function closeDialog() {
 
 function openUpdateDialog(contactEmail) {
     var dialog = document.getElementById("updateDialog");
-    document.getElementById("newDisplayNameDialogInput").value = contactEmail; // Устанавливаем текущее имя в поле ввода
+    document.getElementById("newDisplayNameDialogInput").value = contactEmail; // Should be current display name
     dialog.setAttribute("data-email", contactEmail);
     dialog.showModal();
 }
@@ -263,6 +263,16 @@ function closeAvatarDialog() {
     var dialog = document.getElementById("updateAvatarDialog");
     dialog.close();
 }
+
+document.getElementById("saveDisplayNameButton").addEventListener("click", function (event) {
+    var newDisplayName = document.getElementById("newDisplayNameDialogInput").value;
+    var contactEmail = document.getElementById("updateDialog").getAttribute("data-email");
+    connection.invoke("UpdateContactDisplayName", contactEmail, newDisplayName).catch(function (err) {
+        return console.error(err.toString());
+    });
+    closeUpdateDialog();
+    event.preventDefault();
+});
 
 document.getElementById("saveAvatarButton").addEventListener("click", function (event) {
     var avatarInput = document.getElementById("avatarInput");

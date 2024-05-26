@@ -100,10 +100,11 @@ namespace WebApplication1.Hubs
             _context.Messages.Add(newMessage);
             await _context.SaveChangesAsync();
 
-            var senderAvatar = sender.AvatarPath;
+            var receiverContact = await _context.Contacts.FirstOrDefaultAsync(c => c.UserId == receiver.Id && c.ContactId == sender.Id);
+            var senderDisplayName = receiverContact?.DisplayName ?? sender.Email;
 
-            await Clients.User(receiver.Id).SendAsync("ReceiveMessage", sender.Email, message, senderAvatar);
-            await Clients.Caller.SendAsync("ReceiveMessage", "You", message, senderAvatar);
+            await Clients.User(receiver.Id).SendAsync("ReceiveMessage", senderDisplayName, message, sender.AvatarPath);
+            await Clients.Caller.SendAsync("ReceiveMessage", "You", message, sender.AvatarPath);
         }
 
         public async Task LoadChatHistory(string contactEmail)
@@ -131,14 +132,17 @@ namespace WebApplication1.Hubs
                 return;
             }
 
+            var userContact = await _context.Contacts.FirstOrDefaultAsync(c => c.UserId == user.Id && c.ContactId == contact.Id);
+            var contactDisplayName = userContact?.DisplayName ?? contact.Email;
+
             var messages = chat.Messages.OrderBy(m => m.SentAt).Select(m => new
             {
                 Email = m.Sender.Email,
-                DisplayName = m.SenderId == user.Id ? "You" : m.Sender.Email,
+                DisplayName = m.SenderId == user.Id ? "You" : contactDisplayName,
                 Content = m.Content,
                 SentAt = m.SentAt,
-                MessageType = m.MessageType,
-                Avatar = m.Sender.AvatarPath
+                Avatar = m.Sender.AvatarPath,
+                MessageType = m.MessageType
             }).ToList();
 
             await Clients.Caller.SendAsync("ChatHistory", messages);
