@@ -7,9 +7,13 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
 connection.on("ReceiveMessage", function (user, message, avatar) {
     var li = document.createElement("li");
-    li.style.listStyleType = "none";  // Add this line to remove the dot
+    li.style.listStyleType = "none";
     var container = document.createElement("div");
     container.classList.add("message-container");
+
+    if (user === username) {
+        container.classList.add("sent");
+    }
 
     var img = document.createElement("img");
     img.src = avatar;
@@ -17,6 +21,7 @@ connection.on("ReceiveMessage", function (user, message, avatar) {
 
     var text = document.createElement("span");
     text.textContent = `${user} : ${message}`;
+    text.classList.add("message-content");
 
     container.appendChild(img);
     container.appendChild(text);
@@ -30,6 +35,10 @@ connection.on("ReceiveFile", function (user, filePath, avatar) {
     li.style.listStyleType = "none";
     var container = document.createElement("div");
     container.classList.add("message-container");
+
+    if (user === username) {
+        container.classList.add("sent");
+    }
 
     var img = document.createElement("img");
     img.src = avatar;
@@ -49,6 +58,7 @@ connection.on("ReceiveFile", function (user, filePath, avatar) {
         link.href = filePath;
         link.textContent = `${user} sent a file: ${filePath.split('/').pop()}`;
         link.target = "_blank";
+        link.classList.add("message-file");
         container.appendChild(img);
         container.appendChild(link);
     }
@@ -88,16 +98,18 @@ connection.on("LoadContacts", function (contacts) {
     });
 });
 
-
-
 connection.on("ChatHistory", function (messages) {
     var messagesList = document.getElementById("messagesList");
     messagesList.innerHTML = "";
     messages.forEach(function (message) {
         var li = document.createElement("li");
-        li.style.listStyleType = "none";  // Add this line to remove the dot
+        li.style.listStyleType = "none";
         var container = document.createElement("div");
         container.classList.add("message-container");
+
+        if (message.email === username) {
+            container.classList.add("sent");
+        }
 
         var img = document.createElement("img");
         img.src = message.avatar;
@@ -105,11 +117,8 @@ connection.on("ChatHistory", function (messages) {
 
         if (message.messageType === "text") {
             var text = document.createElement("span");
-            if (message.email === username) {
-                text.textContent = `You : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
-            } else {
-                text.textContent = `${message.displayName} : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
-            }
+            text.textContent = `${message.displayName} : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+            text.classList.add("message-content");
             container.appendChild(img);
             container.appendChild(text);
         } else if (message.messageType === "file") {
@@ -127,6 +136,7 @@ connection.on("ChatHistory", function (messages) {
                 link.href = message.content;
                 link.textContent = `${message.displayName} sent a file: ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
                 link.target = "_blank";
+                link.classList.add("message-file");
                 container.appendChild(img);
                 container.appendChild(link);
             }

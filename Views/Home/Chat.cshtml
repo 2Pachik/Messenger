@@ -149,6 +149,39 @@
         max-height: 200px;
         margin-left: 10px;
     }
+
+    .message-container.sent {
+        justify-content: flex-end;
+        text-align: right;
+    }
+
+    .message-container.sent .avatar {
+            order: 2;
+            margin-left: 10px;
+            margin-right: 0;
+    }
+
+    .message-container.sent .message-content {
+            order: 1;
+    }
+
+    .message-container .message-content {
+        background-color: #e9e9eb;
+        border-radius: 10px;
+        padding: 10px;
+        max-width: 70%;
+        word-wrap: break-word;
+    }
+
+    .message-container .message-file {
+        background-color: #e9e9eb;
+        border-radius: 10px;
+        padding: 10px;
+        max-width: 70%;
+        word-wrap: break-word;
+        display: inline-block;
+        margin-left: 10px;
+    }
 </style>
 
 
