@@ -8,7 +8,7 @@
     .main-container {
         display: flex;
         flex-direction: row;
-        height: 85vh;
+        height: 100vh;
     }
 
     .contacts-container {
@@ -71,8 +71,8 @@
     }
 
     .input-container {
-        flex-shrink: 0;
-        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
     }
 
     .row {
@@ -85,7 +85,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-left: 10px;
         padding: 10px;
         border-radius: 50%;
         border: none;
@@ -94,6 +93,14 @@
         background-color: #1751d0;
         cursor: pointer;
         transition: background-color 0.3s;
+    }
+
+    #sendButton {
+        margin-left: 10px;
+    }
+
+    #uploadButton {
+        margin-right: 10px;
     }
 
     #sendButton:disabled, #uploadButton:disabled {
@@ -148,6 +155,7 @@
         max-width: 200px;
         max-height: 200px;
         margin-left: 10px;
+        border-radius: 10px;
     }
 
     .message-container.sent {
@@ -182,6 +190,10 @@
         display: inline-block;
         margin-left: 10px;
     }
+
+    #messageInput {
+        padding: 10px;
+    }
 </style>
 
 
@@ -199,17 +211,10 @@
                     <ul id="messagesList"></ul>
                 </div>
                 <div class="input-container">
-                    <div class="row p-1">
-                        <div class="col-1">Message</div>
-                        <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
-                    </div>
-                    <div class="row p-1">
-                        <div class="col-6 text-end">
-                            <input type="file" id="fileInput" />
-                            <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
-                            <button type="button" id="sendButton" disabled><i class="material-icons">send</i></button>
-                        </div>
-                    </div>
+                        <input type="file" id="fileInput" />
+                        <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
+                        <input type="text" class="w-100" id="messageInput" placeholder="" />
+                        <button type="button" id="sendButton" disabled><i class="material-icons">send</i></button>
                 </div>
                 <dialog id="dialog">
                     <input type="text" id="contactEmailInput" placeholder="Email"></input>
