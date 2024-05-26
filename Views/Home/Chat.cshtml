@@ -12,7 +12,7 @@
     }
 
     .contacts-container {
-        width: 200px;
+        width: 100%;
         border-right: 1px solid #ddd;
         display: flex;
         flex-direction: column;
@@ -74,6 +74,7 @@
     .input-container {
         display: flex;
         align-items: center;
+        padding: 10px;
     }
 
     .row {
@@ -210,15 +211,49 @@
         border: 2px solid #1751d0;
         transition: border 0.2s ease-in-out;
     }
+
+    #show {
+        cursor: pointer;
+        border: none;
+        background-color: #1751d0;
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    #show:hover {
+        background-color: #1143ae;
+    }
+
+    .context-menu {
+        background-color: #f9f9f9;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .menu-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .menu-list li {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+            .menu-list li:hover {
+                background-color: #f0f0f0;
+            }
 </style>
 
 
     <div class="container">
         <div class="main-container">
-            <div style="display: flex; flex-direction:column;">
+            <div style="display: flex; flex-direction:column; width: 30%;">
                 <button onclick="openAvatarDialog()">Change Avatar</button>
                 <div class="contacts-container" id="contactsContainer">
-                    <button id="show">Add friend</button>
+                    <button id="show">New message</button>
                     <!-- Контакты будут добавляться динамически -->
                 </div>
             </div>
@@ -249,6 +284,15 @@
                     <button id="saveAvatarButton">Save</button>
                     <button class="close">Close</button>
                 </dialog>
+
+            <div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
+                <ul class="menu-list">
+                    <li id="editName">Edit Name</li>
+                    <li id="deleteContact">Delete Contact</li>
+                </ul>
+            </div>
+
+
             </div>
         </div>
     </div>

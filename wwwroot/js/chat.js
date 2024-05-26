@@ -5,6 +5,11 @@ var activeContactButton = null;
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
+
+function clearMsgList() {
+    document.getElementById("messagesList").innerHTML = "";
+}
+
 connection.on("ReceiveMessage", function (user, message, avatar) {
     var li = document.createElement("li");
     li.style.listStyleType = "none";
@@ -66,6 +71,7 @@ connection.on("ReceiveFile", function (user, filePath, avatar) {
     li.appendChild(container);
     document.getElementById("messagesList").appendChild(li);
 });
+
 connection.on("LoadContacts", function (contacts) {
     var contactsContainer = document.getElementById("contactsContainer");
     contactsContainer.innerHTML = '<button id="show">Add friend</button>';
@@ -73,6 +79,7 @@ connection.on("LoadContacts", function (contacts) {
     contacts.forEach(function (contact) {
         var button = document.createElement("button");
         button.className = "contact-button";
+        button.setAttribute("data-email", contact.email);
 
         var avatar = document.createElement("img");
         avatar.src = contact.avatarPath; // Используйте полученный путь напрямую
@@ -90,10 +97,7 @@ connection.on("LoadContacts", function (contacts) {
             currentReceiverEmail = contact.email;
             setActiveContact(button);
         };
-        button.oncontextmenu = function (event) {
-            event.preventDefault();
-            openUpdateDialog(contact.email);
-        };
+
         contactsContainer.appendChild(button);
     });
 });
@@ -149,10 +153,70 @@ connection.on("ChatHistory", function (messages) {
 
 connection.on("ContactAdded", function (contact) {
     alert(`Contact with email ${contact.email} was added successfully`);
+    var contactsContainer = document.getElementById("contactsContainer");
+    var button = document.createElement("button");
+    button.className = "contact-button";
+    button.setAttribute("data-email", contact.email);
+
+    var avatar = document.createElement("img");
+    avatar.src = contact.avatarPath;
+    avatar.classList.add("contact-avatar");
+
+    var displayName = document.createElement("span");
+    displayName.className = "contact-name";
+    displayName.textContent = contact.displayName;
+
+    button.appendChild(avatar);
+    button.appendChild(displayName);
+
+    button.onclick = function () {
+        loadChatHistory(contact.email);
+        currentReceiverEmail = contact.email;
+        setActiveContact(button);
+    };
+
+    contactsContainer.appendChild(button);
 });
 
 connection.on("ContactUpdated", function (contact) {
     alert(`Contact display name updated to ${contact.displayName}`);
+    var contactButtons = document.querySelectorAll(".contact-button");
+    contactButtons.forEach(function (button) {
+        if (button.getAttribute("data-email") === contact.email) {
+            var displayName = button.querySelector(".contact-name");
+            displayName.textContent = contact.displayName;
+        }
+    });
+});
+
+connection.on("AvatarUpdated", function (contact) {
+    alert(`Avatar updated for ${contact.email}`);
+    var contactButtons = document.querySelectorAll(".contact-button");
+    contactButtons.forEach(function (button) {
+        if (button.getAttribute("data-email") === contact.email) {
+            var avatar = button.querySelector(".contact-avatar");
+            avatar.src = contact.avatarPath;
+        }
+    });
+
+    if (contact.email === currentReceiverEmail) {
+        var messageAvatars = document.querySelectorAll(".message-container .avatar");
+        messageAvatars.forEach(function (img) {
+            if (img.src.includes(contact.avatarPath)) {
+                img.src = contact.avatarPath;
+            }
+        });
+    }
+});
+
+connection.on("ContactDeleted", function (contactEmail) {
+    let buttons = document.querySelectorAll(".contact-button");
+    buttons.forEach(function (button) {
+        if (button.getAttribute("data-email") === contactEmail) {
+            button.parentNode.removeChild(button);
+            clearMsgList();
+        }
+    });
 });
 
 connection.on("Error", function (message) {
@@ -280,6 +344,7 @@ document.getElementById("saveAvatarButton").addEventListener("click", function (
     if (file) {
         var formData = new FormData();
         formData.append("avatar", file);
+        formData.append("contactEmail", document.getElementById("updateAvatarDialog").getAttribute("data-email"));
 
         fetch("/upload/avatar", {
             method: "POST",
@@ -287,8 +352,9 @@ document.getElementById("saveAvatarButton").addEventListener("click", function (
         }).then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert("Avatar updated successfully");
-                    // Optionally, reload or update the avatar in the UI
+                    connection.invoke("UpdateAvatar", document.getElementById("updateAvatarDialog").getAttribute("data-email"), data.avatarPath).catch(function (err) {
+                        return console.error(err.toString());
+                    });
                 } else {
                     alert("Error updating avatar: " + data.error);
                 }
@@ -315,9 +381,51 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelector("#updateAvatarDialog .close").addEventListener("click", closeAvatarDialog);
 });
 
-document.addEventListener("contextmenu", function (event) {
+// Удаление старого обработчика контекстного меню
+document.removeEventListener("contextmenu", function (event) {
     if (event.target.classList.contains("contact-button")) {
         event.preventDefault();
         openUpdateDialog(event.target.getAttribute("data-email"));
     }
 });
+
+// Добавление нового контекстного меню
+const contextMenu = document.getElementById("contextMenu");
+
+document.addEventListener("contextmenu", function (event) {
+    if (event.target.classList.contains("contact-button")) {
+        event.preventDefault();
+        contextMenu.style.display = "block";
+        contextMenu.style.left = `${event.pageX}px`;
+        contextMenu.style.top = `${event.pageY}px`;
+
+        // Сохраняем email контакта в data-атрибуте для последующего использования
+        contextMenu.setAttribute("data-email", event.target.getAttribute("data-email"));
+    } else {
+        contextMenu.style.display = "none";
+    }
+});
+
+// Скрыть контекстное меню при клике в любом другом месте
+document.addEventListener("click", function (e) {
+    if (!contextMenu.contains(e.target)) {
+        contextMenu.style.display = "none";
+    }
+});
+
+document.getElementById("editName").addEventListener("click", function () {
+    const email = contextMenu.getAttribute("data-email");
+    openUpdateDialog(email);
+    contextMenu.style.display = "none";
+});
+
+document.getElementById("deleteContact").addEventListener("click", function () {
+    const email = contextMenu.getAttribute("data-email");
+    if (confirm("Are you sure you want to delete this contact?")) {
+        connection.invoke("DeleteContactByEmail", email).catch(function (err) {
+            return console.error(err.toString());
+        });
+    }
+    contextMenu.style.display = "none";
+});
+

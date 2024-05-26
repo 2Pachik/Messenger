@@ -70,8 +70,33 @@ namespace WebApplication1.Hubs
             await Clients.Caller.SendAsync("ContactAdded", new ContactVM
             {
                 Email = contact.Email,
-                DisplayName = newContact.DisplayName
+                DisplayName = newContact.DisplayName,
+                AvatarPath = contact.AvatarPath
             });
+        }
+
+        public async Task DeleteContactByEmail(string contactEmail)
+        {
+            var userEmail = Context.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(userEmail);
+            var contact = await _userManager.FindByNameAsync(contactEmail);
+
+            if (user == null || contact == null)
+            {
+                await Clients.Caller.SendAsync("Error", "User or contact not found");
+                return;
+            }
+
+            var contactToRemove = await _context.Contacts
+                .FirstOrDefaultAsync(c => c.UserId == user.Id && c.ContactId == contact.Id);
+
+            if (contactToRemove != null)
+            {
+                _context.Contacts.Remove(contactToRemove);
+                await _context.SaveChangesAsync();
+
+                await Clients.Caller.SendAsync("ContactDeleted", contactEmail);
+            }
         }
 
         public async Task SendMessage(string receiverEmail, string message)
@@ -193,7 +218,6 @@ namespace WebApplication1.Hubs
             return contacts;
         }
 
-
         public async Task UpdateContactDisplayName(string contactEmail, string newDisplayName)
         {
             var userEmail = Context.User.Identity.Name;
@@ -218,6 +242,35 @@ namespace WebApplication1.Hubs
                 {
                     Email = contactEmail,
                     DisplayName = newDisplayName
+                });
+            }
+        }
+
+        public async Task UpdateAvatar(string contactEmail, string avatarPath)
+        {
+            var userEmail = Context.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(userEmail);
+            var contact = await _userManager.FindByNameAsync(contactEmail);
+
+            if (user == null || contact == null)
+            {
+                await Clients.Caller.SendAsync("Error", "User or contact not found");
+                return;
+            }
+
+            var existingContact = await _context.Contacts
+                .FirstOrDefaultAsync(c => c.UserId == user.Id && c.ContactId == contact.Id);
+
+            if (existingContact != null)
+            {
+                contact.AvatarPath = avatarPath;
+                _context.Users.Update(contact);
+                await _context.SaveChangesAsync();
+
+                await Clients.User(user.Id).SendAsync("AvatarUpdated", new ContactVM
+                {
+                    Email = contactEmail,
+                    AvatarPath = avatarPath
                 });
             }
         }
