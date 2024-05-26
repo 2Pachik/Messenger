@@ -56,7 +56,6 @@ connection.on("ReceiveFile", function (user, filePath, avatar) {
     li.appendChild(container);
     document.getElementById("messagesList").appendChild(li);
 });
-
 connection.on("LoadContacts", function (contacts) {
     var contactsContainer = document.getElementById("contactsContainer");
     contactsContainer.innerHTML = '<button id="show">Add friend</button>';
@@ -64,7 +63,18 @@ connection.on("LoadContacts", function (contacts) {
     contacts.forEach(function (contact) {
         var button = document.createElement("button");
         button.className = "contact-button";
-        button.textContent = contact.displayName;
+
+        var avatar = document.createElement("img");
+        avatar.src = contact.avatarPath; // Используйте полученный путь напрямую
+        avatar.classList.add("contact-avatar");
+
+        var displayName = document.createElement("span");
+        displayName.className = "contact-name";
+        displayName.textContent = contact.displayName;
+
+        button.appendChild(avatar);
+        button.appendChild(displayName);
+
         button.onclick = function () {
             loadChatHistory(contact.email);
             currentReceiverEmail = contact.email;
@@ -77,6 +87,8 @@ connection.on("LoadContacts", function (contacts) {
         contactsContainer.appendChild(button);
     });
 });
+
+
 
 connection.on("ChatHistory", function (messages) {
     var messagesList = document.getElementById("messagesList");

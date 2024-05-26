@@ -182,11 +182,13 @@ namespace WebApplication1.Hubs
                 .Select(c => new ContactVM
                 {
                     Email = c.ContactUser.Email,
-                    DisplayName = c.DisplayName
+                    DisplayName = c.DisplayName,
+                    AvatarPath = c.ContactUser.AvatarPath ?? "/uploads/avatars/default.jpg"
                 })
                 .ToListAsync();
             return contacts;
         }
+
 
         public async Task UpdateContactDisplayName(string contactEmail, string newDisplayName)
         {

@@ -28,15 +28,34 @@
         text-align: left;
         cursor: pointer;
         transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        white-space: nowrap; /* Добавляет перенос строки */
+        overflow: hidden; /* Скрывает переполнение */
+        text-overflow: ellipsis; /* Добавляет многоточие при переполнении */
     }
 
-        .contact-button:hover {
-            background-color: #ddd;
-        }
+    .contact-button:hover {
+        background-color: #ddd;
+    }
 
     .active-contact {
         background-color: #007bff;
         color: white;
+    }
+
+    .contact-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        margin-right: 10px;
+        flex-shrink: 0; /* Запрещает изменять размер аватарки */
+    }
+
+    .contact-name {
+        flex-grow: 1; /* Разрешает имени заполнять оставшееся пространство */
+        overflow: hidden; /* Скрывает переполнение */
+        text-overflow: ellipsis; /* Добавляет многоточие при переполнении */
     }
 
     .test {
@@ -77,18 +96,18 @@
         transition: background-color 0.3s;
     }
 
-        #sendButton:disabled, #uploadButton:disabled {
-            cursor: not-allowed;
-            background-color: #999999;
-        }
+    #sendButton:disabled, #uploadButton:disabled {
+        cursor: not-allowed;
+        background-color: #999999;
+    }
 
-        #sendButton:hover:enabled, #uploadButton:hover:enabled {
-            background-color: #0d3ea9;
-        }
+    #sendButton:hover:enabled, #uploadButton:hover:enabled {
+        background-color: #0d3ea9;
+    }
 
-        #sendButton i, #uploadButton i {
-            font-size: 24px; /* Adjust the icon size if needed */
-        }
+    #sendButton i, #uploadButton i {
+        font-size: 24px; /* Adjust the icon size if needed */
+    }
 
     ul#messagesList {
         padding-left: 0;
@@ -103,14 +122,14 @@
         padding: 20px;
     }
 
-        dialog .close {
-            background: #d9534f;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            float: right;
-        }
+    dialog .close {
+        background: #d9534f;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        float: right;
+    }
 
     .avatar {
         width: 40px;
