@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using WebApplication1.Data;
 using WebApplication1.Models;
 using WebApplication1.ViewModels;
 
@@ -16,16 +18,18 @@ namespace WebApplication1.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<AccountController> _logger;
+        private readonly AppDbContext _context;
 
         public AccountController(
             SignInManager<AppUser> signInManager,
             UserManager<AppUser> userManager,
-            IEmailSender emailSender,
+            IEmailSender emailSender, AppDbContext context,
             ILogger<AccountController> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _emailSender = emailSender;
+            _context = context;
             _logger = logger;
         }
 
@@ -222,7 +226,8 @@ namespace WebApplication1.Controllers
 			return RedirectToAction(nameof(Login));
 		}
 
-		private IActionResult RedirectToLocal(string? returnUrl)
+
+        private IActionResult RedirectToLocal(string? returnUrl)
 		{
 			if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
 			{

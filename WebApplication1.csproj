@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\nav-bar.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Views\EmailTemplates\ConfirmationEmailTemplate.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\nav-bar.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,8 +39,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\resources\" />
     <Folder Include="wwwroot\uploads\avatars\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\nav-bar.js" />
   </ItemGroup>
 
 </Project>

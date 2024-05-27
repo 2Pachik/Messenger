@@ -5,7 +5,6 @@ var activeContactButton = null;
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
-
 function clearMsgList() {
     document.getElementById("messagesList").innerHTML = "";
 }
@@ -74,7 +73,6 @@ connection.on("ReceiveFile", function (user, filePath, avatar) {
 
 connection.on("LoadContacts", function (contacts) {
     var contactsContainer = document.getElementById("contactsContainer");
-    contactsContainer.innerHTML = '<button id="show">Add friend</button>';
     document.getElementById("show").addEventListener("click", openDialog);
     contacts.forEach(function (contact) {
         var button = document.createElement("button");
@@ -82,7 +80,7 @@ connection.on("LoadContacts", function (contacts) {
         button.setAttribute("data-email", contact.email);
 
         var avatar = document.createElement("img");
-        avatar.src = contact.avatarPath; // Используйте полученный путь напрямую
+        avatar.src = contact.avatarPath; // Используйте полученный путь  напрямую
         avatar.classList.add("contact-avatar");
 
         var displayName = document.createElement("span");
@@ -318,16 +316,6 @@ function closeUpdateDialog() {
     dialog.close();
 }
 
-function openAvatarDialog() {
-    var dialog = document.getElementById("updateAvatarDialog");
-    dialog.showModal();
-}
-
-function closeAvatarDialog() {
-    var dialog = document.getElementById("updateAvatarDialog");
-    dialog.close();
-}
-
 document.getElementById("saveDisplayNameButton").addEventListener("click", function (event) {
     var newDisplayName = document.getElementById("newDisplayNameDialogInput").value;
     var contactEmail = document.getElementById("updateDialog").getAttribute("data-email");
@@ -335,34 +323,6 @@ document.getElementById("saveDisplayNameButton").addEventListener("click", funct
         return console.error(err.toString());
     });
     closeUpdateDialog();
-    event.preventDefault();
-});
-
-document.getElementById("saveAvatarButton").addEventListener("click", function (event) {
-    var avatarInput = document.getElementById("avatarInput");
-    var file = avatarInput.files[0];
-    if (file) {
-        var formData = new FormData();
-        formData.append("avatar", file);
-        formData.append("contactEmail", document.getElementById("updateAvatarDialog").getAttribute("data-email"));
-
-        fetch("/upload/avatar", {
-            method: "POST",
-            body: formData
-        }).then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    connection.invoke("UpdateAvatar", document.getElementById("updateAvatarDialog").getAttribute("data-email"), data.avatarPath).catch(function (err) {
-                        return console.error(err.toString());
-                    });
-                } else {
-                    alert("Error updating avatar: " + data.error);
-                }
-            }).catch(error => {
-                console.error("Error uploading avatar:", error);
-            });
-    }
-    closeAvatarDialog();
     event.preventDefault();
 });
 
@@ -378,7 +338,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelector("#dialog .close").addEventListener("click", closeDialog);
     document.querySelector("#updateDialog .close").addEventListener("click", closeUpdateDialog);
-    document.querySelector("#updateAvatarDialog .close").addEventListener("click", closeAvatarDialog);
 });
 
 // Удаление старого обработчика контекстного меню
@@ -393,18 +352,26 @@ document.removeEventListener("contextmenu", function (event) {
 const contextMenu = document.getElementById("contextMenu");
 
 document.addEventListener("contextmenu", function (event) {
-    if (event.target.classList.contains("contact-button")) {
+    let target = event.target;
+
+    // Проверяем, был ли клик на аватарке или имени контакта, и поднимаемся до родителя с классом 'contact-button'
+    if (target.classList.contains("contact-avatar") || target.classList.contains("contact-name")) {
+        target = target.closest(".contact-button");
+    }
+
+    if (target && target.classList.contains("contact-button")) {
         event.preventDefault();
         contextMenu.style.display = "block";
         contextMenu.style.left = `${event.pageX}px`;
         contextMenu.style.top = `${event.pageY}px`;
 
         // Сохраняем email контакта в data-атрибуте для последующего использования
-        contextMenu.setAttribute("data-email", event.target.getAttribute("data-email"));
+        contextMenu.setAttribute("data-email", target.getAttribute("data-email"));
     } else {
         contextMenu.style.display = "none";
     }
 });
+
 
 // Скрыть контекстное меню при клике в любом другом месте
 document.addEventListener("click", function (e) {

@@ -13,7 +13,6 @@
 
     .contacts-container {
         width: 100%;
-        border-right: 1px solid #ddd;
         display: flex;
         flex-direction: column;
         overflow-y: auto;
@@ -28,7 +27,7 @@
         margin: 5px 0;
         text-align: left;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: all 0.2s;
         display: flex;
         align-items: center;
         white-space: nowrap; /* Добавляет перенос строки */
@@ -37,6 +36,7 @@
     }
 
     .contact-button:hover {
+        color: black;
         background-color: #ddd;
     }
 
@@ -64,6 +64,9 @@
         flex-direction: column;
         flex-grow: 1;
         overflow: hidden;
+/*         background-image: url("https://localhost:7262/resources/background.png");
+        background-size: 120%; */
+        margin-bottom: 10px;
     }
 
     .content {
@@ -75,6 +78,7 @@
         display: flex;
         align-items: center;
         padding: 10px;
+        background-color: transparent;
     }
 
     .row {
@@ -128,16 +132,46 @@
 
     dialog {
         border: solid 1px #ccc;
+        border-radius: 24px;
         padding: 20px;
+
+    }
+
+    .addUserDialog {
+        display: flex;
+    }
+
+    dialog input {
+        border: 2px solid #ccc;
+        outline: none;
+        border-radius: 12px;
+        padding: 11px;
+        transition: all 0.2s;
+    }
+
+    dialog input:hover, 
+    dialog input:active,
+    dialog input:focus {
+        border: 2px solid #1751d0;
+        transition: all 0.2s;
+    }
+
+    dialog .add {
+        display: flex;
+        border-radius: 24px;
+        border: none;
+        padding: 12px;
+        margin-left: 10px;
+        cursor: pointer;
     }
 
     dialog .close {
-        background: #d9534f;
-        color: white;
+        display: flex;
+        border-radius: 24px;
         border: none;
-        padding: 5px 10px;
+        padding: 12px;
+        margin-left: 10px;
         cursor: pointer;
-        float: right;
     }
 
     .avatar {
@@ -145,6 +179,7 @@
         height: 40px;
         border-radius: 50%;
         margin-right: 10px;
+        border: 3px solid #e9e9eb;
     }
 
     .message-container {
@@ -179,6 +214,7 @@
     .message-container .message-content {
         background-color: #e9e9eb;
         border-radius: 10px;
+        color: black;
         padding: 10px;
         max-width: 70%;
         word-wrap: break-word;
@@ -196,10 +232,10 @@
 
     #messageInput {
         padding: 10px;
-        padding-left: 12px;
+        padding-left: 18px;
         outline: none;
         border: 2px solid #dcdcde;
-        border-radius: 8px;
+        border-radius: 50px;
         width: 100%;
         box-sizing: border-box; /* Added this line */
         transition: border 0.2s ease-in-out;
@@ -213,12 +249,17 @@
     }
 
     #show {
-        cursor: pointer;
-        border: none;
-        background-color: #1751d0;
-        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         padding: 10px;
-        border-radius: 10px;
+        border-radius: 50%;
+        border: none;
+        outline: none;
+        color: white;
+        background-color: #1751d0;
+        cursor: pointer;
+        transition: background-color 0.3s;
     }
 
     #show:hover {
@@ -227,7 +268,7 @@
 
     .context-menu {
         background-color: #f9f9f9;
-        border: 1px solid #ccc;
+        border: 2px solid #ccc;
         padding: 10px;
     }
 
@@ -237,24 +278,32 @@
         margin: 0;
     }
 
-        .menu-list li {
-            padding: 8px 12px;
-            cursor: pointer;
-        }
+    .menu-list li {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
 
-            .menu-list li:hover {
-                background-color: #f0f0f0;
-            }
+    .menu-list li:hover {
+        background-color: #f0f0f0;
+    }
+
+    .messages-header {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: baseline;
+    }
 </style>
 
 
     <div class="container">
         <div class="main-container">
-            <div style="display: flex; flex-direction:column; width: 30%;">
-                <button onclick="openAvatarDialog()">Change Avatar</button>
+            <div style="display: flex; flex-direction:column; min-width: 30%; max-width: 30%;">
+                <div class="messages-header">
+                    <h1>Messages</h1>
+                    <button id="show"><i class="material-icons">edit</i></button>
+                </div>
                 <div class="contacts-container" id="contactsContainer">
-                    <button id="show">New message</button>
-                    <!-- Контакты будут добавляться динамически -->
+                     <!-- Контакты будут добавляться динамически -->
                 </div>
             </div>
             <div class="test">
@@ -268,21 +317,17 @@
                         <button type="button" id="sendButton" disabled><i class="material-icons">send</i></button>
                 </div>
                 <dialog id="dialog">
-                    <input type="text" id="contactEmailInput" placeholder="Email"></input>
-                    <button id="addContactButton">Add</button>
-                    <button class="close">Close</button>
+                    <div class="addUserDialog">
+                        <input type="text" id="contactEmailInput" placeholder="Email"></input>
+                        <button class="add" id="addContactButton"><i class="material-icons">add</i></button>
+                        <button class="close"><i class="material-icons">close</i></button>
+                    </div>
                 </dialog>
 
                 <dialog id="updateDialog">
-                    <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name"></input>
-                    <button id="saveDisplayNameButton">Save</button>
-                    <button class="close">Close</button>
-                </dialog>
-
-                <dialog id="updateAvatarDialog">
-                    <input type="file" id="avatarInput" accept="image/*" />
-                    <button id="saveAvatarButton">Save</button>
-                    <button class="close">Close</button>
+                    <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name" />
+                    <button id="saveDisplayNameButton"><i class="material-icons">save</i></button>
+                    <button class="close"><i class="material-icons">close</i></button>
                 </dialog>
 
             <div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
@@ -291,8 +336,6 @@
                     <li id="deleteContact">Delete Contact</li>
                 </ul>
             </div>
-
-
             </div>
         </div>
     </div>

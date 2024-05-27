@@ -9,19 +9,33 @@
         font-style: normal;
         font-variation-settings: "slnt" 0;
     }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-avatar {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 50%;
+    }
+   
 </style>
 
 <ul class="navbar-nav">
     @if (signInManager.IsSignedIn(User))
     {
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown user-info">
+            <img class="navbar-avatar" onclick="openAvatarDialog()" />
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 @User.Identity!.Name
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li>
                     <form method="post" asp-controller="Account" asp-action="Settings">
-                        <button type="submit" class="dropdown-item">Contacts</button>
+                        <button type="submit" class="dropdown-item">Messages</button>
                     </form>
                     <form method="post" asp-controller="Account" asp-action="Settings">
                         <button type="submit" class="dropdown-item">Settings</button>
@@ -42,4 +56,11 @@
             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
         </li> *@
     }
+    <dialog id="updateAvatarDialog">
+        <input type="file" id="avatarInput" accept="image/*" />
+        <button id="saveAvatarButton">Save</button>
+        <button class="close">Close</button>
+    </dialog>
 </ul>
+
+<script src="~/js/nav-bar.js" ></script>
