@@ -3,7 +3,11 @@
 var currentReceiverEmail = null;
 var activeContactButton = null;
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+var connection = new signalR.HubConnectionBuilder()
+    .withUrl("/chatHub")
+    .withAutomaticReconnect()
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
 
 function clearMsgList() {
     document.getElementById("messagesList").innerHTML = "";
@@ -394,5 +398,34 @@ document.getElementById("deleteContact").addEventListener("click", function () {
         });
     }
     contextMenu.style.display = "none";
+});
+
+document.getElementById("avatarImage").addEventListener("click", function () {
+    document.getElementById("avatarInput").click();
+});
+
+document.getElementById("avatarInput").addEventListener("change", function (event) {
+    var file = event.target.files[0];
+    if (file) {
+        var formData = new FormData();
+        formData.append("avatar", file);
+
+        fetch("/upload/avatar", {
+            method: "POST",
+            body: formData
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Avatar updated successfully");
+                    // Update avatar on all necessary UI elements
+                    var avatars = document.querySelectorAll(".avatar");
+                    avatars.forEach(avatar => avatar.src = data.avatarUrl);
+                } else {
+                    alert("Error updating avatar: " + data.error);
+                }
+            }).catch(error => {
+                console.error("Error uploading avatar:", error);
+            });
+    }
 });
 
