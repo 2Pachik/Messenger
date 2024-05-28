@@ -66,9 +66,9 @@
         flex-direction: column;
         flex-grow: 1;
         overflow: hidden;
-        background-image: url("https://blog.1a23.com/wp-content/uploads/sites/2/2020/02/Desktop.png");
-        background-size: 120%;
+        background-image: radial-gradient(circle at top left, rgb(212, 218, 185), transparent), radial-gradient(circle at top right, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom left, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom right, rgb(209, 214, 141), transparent), url("https://localhost:7262/resources/pattern.svg");
         border-left: 2px solid #dddddd;
+        max-width: 60%;
     }
 
     .content {
@@ -105,9 +105,9 @@
         transition: color 0.3s;
     }
 
-    #uploadButton {
+/*     #uploadButton {
         transform: rotate(45deg);
-    }
+    } */
 
         #sendButton:disabled, #uploadButton:disabled {
             background-color: transparent;
@@ -160,7 +160,7 @@
 
     .message-container {
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         padding: 5px 10px;
     }
 
@@ -188,12 +188,33 @@
         }
 
     .message-content {
+        font-size: 14px;
         background-color: #e9e9eb;
-        border-radius: 10px;
+        border-bottom-left-radius: 30px;
+        border-top-left-radius: 30px;
+        border-bottom-right-radius: 10px;
+        border-top-right-radius: 10px;
         color: black;
         padding: 10px;
+        padding-left: 15px;
         max-width: 70%;
         word-wrap: break-word;
+        line-height: 1.3125;
+    }
+
+    .message-content-contact {
+        font-size: 14px;
+        background-color: #e9e9eb;
+        border-bottom-left-radius: 10px;
+        border-top-left-radius: 10px;
+        border-bottom-right-radius: 30px;
+        border-top-right-radius: 30px;
+        color: black;
+        padding: 10px;
+        padding-right: 15px;
+        max-width: 70%;
+        word-wrap: break-word;
+        line-height: 1.3125;
     }
 
     .message-container.sent .message-content {
@@ -250,6 +271,7 @@
         padding: 0 10px;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .bottom-msg-input {

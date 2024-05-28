@@ -28,18 +28,20 @@ connection.on("ReceiveMessage", function (user, message, avatar) {
     img.classList.add("avatar");
 
     var messageContent = document.createElement("div");
-    messageContent.classList.add("message-content");
 
     if (user !== "You") {
+        messageContent.classList.add("message-content-contact");
         var username = document.createElement("div");
         username.textContent = user;
         username.style.color = "#469af4";
         username.style.fontWeight = "bold";
         messageContent.appendChild(username);
+    } else {
+        messageContent.classList.add("message-content");
     }
 
     var text = document.createElement("div");
-    text.textContent = message + " " + message.sentAt;
+    text.textContent = `${message} (${new Date(message.sentAt).toLocaleTimeString()})`;
     messageContent.appendChild(text);
 
     container.appendChild(img);
@@ -48,7 +50,6 @@ connection.on("ReceiveMessage", function (user, message, avatar) {
     li.appendChild(container);
     document.getElementById("messagesList").appendChild(li);
 });
-
 
 connection.on("ReceiveFile", function (user, filePath, avatar) {
     var li = document.createElement("li");
@@ -134,15 +135,25 @@ connection.on("ChatHistory", function (messages) {
         img.classList.add("avatar");
 
         if (message.messageType === "text") {
-            var text = document.createElement("span");
+            var messageContainer = document.createElement("div");
+            var username_ = document.createElement("div");
+            var text = document.createElement("div");
             if (message.email === username) {
                 text.textContent = `${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                text.classList.add("message-content");
+                container.appendChild(img);
+                container.appendChild(text);
             } else {
-                text.textContent = `${message.displayName} : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                messageContainer.classList.add("message-content-contact");
+                username_.textContent = message.displayName;
+                username_.style.color = "#469af4";
+                username_.style.fontWeight = "bold";
+                messageContainer.appendChild(username_);
+                text.textContent = `${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                messageContainer.appendChild(text);
+                container.appendChild(img);
+                container.appendChild(messageContainer);
             }
-            text.classList.add("message-content");
-            container.appendChild(img);
-            container.appendChild(text);
         } else if (message.messageType === "file") {
             var fileExtension = message.content.split('.').pop().toLowerCase();
             var isImage = ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(fileExtension);
