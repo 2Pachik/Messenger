@@ -192,17 +192,6 @@ connection.on("ContactAdded", function (contact) {
     contactsContainer.appendChild(button);
 });
 
-connection.on("ContactUpdated", function (contact) {
-    alert(`Contact display name updated to ${contact.displayName}`);
-    var contactButtons = document.querySelectorAll(".contact-button");
-    contactButtons.forEach(function (button) {
-        if (button.getAttribute("data-email") === contact.email) {
-            var displayName = button.querySelector(".contact-name");
-            displayName.textContent = contact.displayName;
-        }
-    });
-});
-
 connection.on("AvatarUpdated", function (contact) {
     alert(`Avatar updated for ${contact.email}`);
     var contactButtons = document.querySelectorAll(".contact-button");
