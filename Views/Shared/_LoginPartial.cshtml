@@ -3,7 +3,7 @@
 @inject UserManager<AppUser> UserManager
 @{
     var user = await UserManager.GetUserAsync(User);
-    var avatarPath = user?.AvatarPath ?? "/images/default-avatar.png"; // путь к изображению по умолчанию, если аватар отсутствует
+    var avatarPath = user?.AvatarPath ?? "https://localhost:7262/uploads/avatars/default.jpg"; // путь к изображению по умолчанию, если аватар отсутствует
 }
 
 <style>
@@ -34,7 +34,6 @@
     {
         <li class="nav-item dropdown user-info">
             <div>
-                @* <button id="avatarButton"><i class="material-icons">add_a_photo</i></button> *@
                 <img class="navbar-avatar" id="avatarImage" src="@avatarPath" />
                 <input type="file" id="avatarInput" style="display: none;" accept="image/*">
             </div>
@@ -43,6 +42,7 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li>
+                    <button type="submit" class="dropdown-item" id="show">Add contact</button>
                     <form method="post" asp-controller="Account" asp-action="Settings">
                         <button type="submit" class="dropdown-item">Messages</button>
                     </form>
@@ -61,5 +61,36 @@
         
     }
 </ul>
+
+<script>
+    document.getElementById("avatarImage").addEventListener("click", function () {
+        document.getElementById("avatarInput").click();
+    });
+
+    document.getElementById("avatarInput").addEventListener("change", function (event) {
+        var file = event.target.files[0];
+        if (file) {
+            var formData = new FormData();
+            formData.append("avatar", file);
+
+            fetch("/upload/avatar", {
+                method: "POST",
+                body: formData
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Avatar updated successfully");
+                        // Update avatar on all necessary UI elements
+                        var avatars = document.querySelectorAll(".avatar");
+                        avatars.forEach(avatar => avatar.src = data.avatarUrl);
+                    } else {
+                        alert("Error updating avatar: " + data.error);
+                    }
+                }).catch(error => {
+                    console.error("Error uploading avatar:", error);
+                });
+        }
+    });
+</script>
 
  

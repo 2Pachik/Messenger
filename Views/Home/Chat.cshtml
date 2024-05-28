@@ -64,9 +64,9 @@
         flex-direction: column;
         flex-grow: 1;
         overflow: hidden;
-/*         background-image: url("https://localhost:7262/resources/background.png");
-        background-size: 120%; */
-        margin-bottom: 10px;
+        background-image: url("https://localhost:7262/resources/background.png");
+        background-size: 120%;
+        border-left: 2px solid #dddddd;
     }
 
     .content {
@@ -77,8 +77,10 @@
     .input-container {
         display: flex;
         align-items: center;
-        padding: 10px;
-        background-color: transparent;
+        padding: 8px;
+        background-color: white;
+        width: 80%;
+        border-radius: 12px;
     }
 
     .row {
@@ -95,27 +97,24 @@
         border-radius: 50%;
         border: none;
         outline: none;
-        color: white;
-        background-color: #1751d0;
+        color: #ccc;
+        background-color: transparent;
         cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    #sendButton {
-        margin-left: 10px;
+        transition: color 0.3s;
     }
 
     #uploadButton {
-        margin-right: 10px;
+        transform: rotate(45deg);
     }
 
     #sendButton:disabled, #uploadButton:disabled {
         cursor: not-allowed;
-        background-color: #dcdcde;
+        background-color: transparent;
     }
 
-    #sendButton:hover:enabled, #uploadButton:hover:enabled {
-        background-color: #0d3ea9;
+    #sendButton:hover:enabled, #uploadButton:hover:enabled, #sendButton:enabled {
+        color: #0d3ea9;
+        transition: all 0.3s;
     }
 
     #sendButton i, #uploadButton i {
@@ -186,6 +185,7 @@
         display: flex;
         align-items: center;
         padding: 10px;
+        padding-top: 2px;
     }
 
     .message-image {
@@ -231,39 +231,17 @@
     }
 
     #messageInput {
-        padding: 10px;
         padding-left: 18px;
+        padding: 10px;
+        border:none;
+        background-color: transparent;
         outline: none;
-        border: 2px solid #dcdcde;
-        border-radius: 50px;
         width: 100%;
         box-sizing: border-box; /* Added this line */
-        transition: border 0.2s ease-in-out;
     }
 
-    #messageInput:hover,
-    #messageInput:active,
-    #messageInput:focus {
-        border: 2px solid #1751d0;
-        transition: border 0.2s ease-in-out;
-    }
-
-    #show {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px;
-        border-radius: 50%;
-        border: none;
-        outline: none;
-        color: white;
-        background-color: #1751d0;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    #show:hover {
-        background-color: #1143ae;
+    #messageInput::placeholder {
+        color: #ccc;
     }
 
     .context-menu {
@@ -287,38 +265,45 @@
         background-color: #f0f0f0;
     }
 
-    .messages-header {
+    #messages-header {
         display: flex;
-        justify-content: space-evenly;
-        align-items: baseline;
+        align-items: center;
+        padding-left: 15px;
+        margin-bottom: 0px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .bottom-msg-input {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 85px;
     }
 </style>
 
 
     <div class="container">
         <div class="main-container">
-            <div style="display: flex; flex-direction:column; min-width: 30%; max-width: 30%;">
-                <div class="messages-header">
-                    <h1>Messages</h1>
-                    <button id="show"><i class="material-icons">edit</i></button>
-                </div>
-                <div class="contacts-container" id="contactsContainer">
-                     <!-- Контакты будут добавляться динамически -->
-                </div>
+            <div style="display: flex; flex-direction:column; width: 30%;">
+                <h1 id="messages-header">Messages</h1>
+                <div class="contacts-container" id="contactsContainer"></div>
             </div>
             <div class="test">
                 <div class="content">
                     <ul id="messagesList"></ul>
                 </div>
-                <div class="input-container">
+                <div class="bottom-msg-input">
+                    <div class="input-container">
                         <input type="file" id="fileInput" />
                         <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
-                        <input type="text" class="w-100" id="messageInput" placeholder="" />
+                        <input type="text" class="w-100" id="messageInput" placeholder="Message" />
                         <button type="button" id="sendButton" disabled><i class="material-icons">send</i></button>
+                    </div>
                 </div>
                 <dialog id="dialog">
                     <div class="addUserDialog">
-                        <input type="text" id="contactEmailInput" placeholder="Email"></input>
+                        <input type="text" id="contactEmailInput" placeholder="Email" />
                         <button class="add" id="addContactButton"><i class="material-icons">add</i></button>
                         <button class="close"><i class="material-icons">close</i></button>
                     </div>
@@ -330,7 +315,7 @@
                     <button class="close"><i class="material-icons">close</i></button>
                 </dialog>
 
-            <div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
+                <div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
                 <ul class="menu-list">
                     <li id="editName">Edit Name</li>
                     <li id="deleteContact">Delete Contact</li>
