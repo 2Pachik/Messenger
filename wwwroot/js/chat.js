@@ -19,7 +19,7 @@ connection.on("ReceiveMessage", function (user, message, avatar) {
     var container = document.createElement("div");
     container.classList.add("message-container");
 
-    if (user === username) {
+    if (user === "You") {
         container.classList.add("sent");
     }
 
@@ -28,7 +28,11 @@ connection.on("ReceiveMessage", function (user, message, avatar) {
     img.classList.add("avatar");
 
     var text = document.createElement("span");
-    text.textContent = `${user} : ${message}`;
+    if (user != "You") {
+        text.textContent = `${user} : ${message}`;
+    } else {
+        text.textContent = `${message}`;
+    }
     text.classList.add("message-content");
 
     container.appendChild(img);
@@ -44,7 +48,7 @@ connection.on("ReceiveFile", function (user, filePath, avatar) {
     var container = document.createElement("div");
     container.classList.add("message-container");
 
-    if (user === username) {
+    if (user === "You") {
         container.classList.add("sent");
     }
 
@@ -64,7 +68,7 @@ connection.on("ReceiveFile", function (user, filePath, avatar) {
     } else {
         var link = document.createElement("a");
         link.href = filePath;
-        link.textContent = `${user} sent a file: ${filePath.split('/').pop()}`;
+        link.textContent = getFileName(filePath);
         link.target = "_blank";
         link.classList.add("message-file");
         container.appendChild(img);
@@ -123,7 +127,11 @@ connection.on("ChatHistory", function (messages) {
 
         if (message.messageType === "text") {
             var text = document.createElement("span");
-            text.textContent = `${message.displayName} : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+            if (message.email === username) {
+                text.textContent = `${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+            } else {
+                text.textContent = `${message.displayName} : ${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+            }
             text.classList.add("message-content");
             container.appendChild(img);
             container.appendChild(text);
@@ -140,7 +148,11 @@ connection.on("ChatHistory", function (messages) {
             } else {
                 var link = document.createElement("a");
                 link.href = message.content;
-                link.textContent = `${message.displayName} : ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                if (message.email === username) {
+                    link.textContent = `${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                } else {
+                    link.textContent = `${message.displayName} : ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                }
                 link.target = "_blank";
                 link.classList.add("message-file");
                 container.appendChild(img);
@@ -283,6 +295,16 @@ document.getElementById("addContactButton").addEventListener("click", function (
     event.preventDefault();
     closeDialog();
 });
+
+function getFileName(filePath) {
+    var lastSlashIndex = filePath.lastIndexOf('/');
+
+    // +1 для того, чтобы начать с символа после последнего слэша
+    var fileName = filePath.substring(lastSlashIndex + 1);
+
+    return fileName;
+};
+
 
 function loadChatHistory(contactEmail) {
     connection.invoke("LoadChatHistory", contactEmail).catch(function (err) {

@@ -1,9 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Identity;
 @inject SignInManager<AppUser> signInManager;
 @inject UserManager<AppUser> UserManager
+
 @{
     var user = await UserManager.GetUserAsync(User);
-    var avatarPath = user?.AvatarPath ?? "https://localhost:7262/uploads/avatars/default.jpg"; // путь к изображению по умолчанию, если аватар отсутствует
+    var avatarPath = user?.AvatarPath ?? "/uploads/avatars/default.jpg";
 }
 
 <style>
@@ -58,7 +59,7 @@
     }
     else
     {
-        
+        // Можно добавить альтернативный контент для неавторизованных пользователей
     }
 </ul>
 
@@ -92,5 +93,3 @@
         }
     });
 </script>
-
- 

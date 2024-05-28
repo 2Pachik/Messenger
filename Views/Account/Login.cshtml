@@ -1,5 +1,7 @@
 ﻿﻿@using WebApplication1.ViewModels;
 @model LoginVM
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<AppUser> signInManager;
 
 @{
     ViewData["Title"] = "Login";
@@ -200,6 +202,10 @@
         <div class="text-danger inter-regular">@ViewData["ErrorMessage"]</div>
     }
 
+    @if (signInManager.IsSignedIn(User))
+    {
+        <a href="https://localhost:7262/Home/Chat">Open messanger</a>
+    } else {
     <div class="inter-semibold">Login to account</div>
     <form asp-action="Login" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
         
@@ -242,6 +248,7 @@
 
         </div>
     </form>
+    }
 </div>
 
 <script>
