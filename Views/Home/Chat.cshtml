@@ -1,7 +1,7 @@
 ﻿@page
 
 <script>
-    var username = "@User.Identity!.Name";
+    const username = "@User.Identity!.Name";
 </script>
 
 <style>
@@ -16,7 +16,7 @@
         display: flex;
         flex-direction: column;
         overflow-y: auto;
-        padding: 10px;
+        padding-right: 10px;
     }
 
     .contact-button {
@@ -30,38 +30,38 @@
         transition: all 0.2s;
         display: flex;
         align-items: center;
-        white-space: nowrap; /* Добавляет перенос строки */
-        overflow: hidden; /* Скрывает переполнение */
-        text-overflow: ellipsis; /* Добавляет многоточие при переполнении */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .contact-button:hover {
-        color: black;
-        background-color: #ddd;
-    }
+        .contact-button:hover {
+            color: black;
+            background-color: #ddd;
+        }
 
     .active-contact {
         background-color: #007bff;
         color: white;
     }
 
-    .contact-avatar {
+    .contact-avatar, .avatar {
         width: 32px;
         height: 32px;
         border-radius: 50%;
         margin-right: 10px;
         border: 3px solid #e9e9eb;
         background-color: #1751d0;
-        flex-shrink: 0; /* Запрещает изменять размер аватарки */
+        flex-shrink: 0;
     }
 
     .contact-name {
-        flex-grow: 1; /* Разрешает имени заполнять оставшееся пространство */
-        overflow: hidden; /* Скрывает переполнение */
-        text-overflow: ellipsis; /* Добавляет многоточие при переполнении */
+        flex-grow: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .test {
+    .chat-area {
         display: flex;
         flex-direction: column;
         flex-grow: 1;
@@ -109,19 +109,18 @@
         transform: rotate(45deg);
     }
 
-    #sendButton:disabled, #uploadButton:disabled {
-        cursor: not-allowed;
-        background-color: transparent;
-    }
+        #sendButton:disabled, #uploadButton:disabled {
+            background-color: transparent;
+        }
 
-    #sendButton:hover:enabled, #uploadButton:hover:enabled, #sendButton:enabled {
-        color: #3390ec;
-        transition: all 0.3s;
-    }
+        #sendButton:hover:enabled, #uploadButton:hover:enabled, #sendButton:enabled {
+            color: #3390ec;
+            transition: all 0.3s;
+        }
 
-    #sendButton i, #uploadButton i {
-        font-size: 24px; /* Adjust the icon size if needed */
-    }
+        #sendButton i, #uploadButton i {
+            font-size: 24px;
+        }
 
     ul#messagesList {
         padding-left: 0;
@@ -135,11 +134,15 @@
         border: solid 1px #ccc;
         border-radius: 24px;
         padding: 20px;
-
     }
 
-    .addUserDialog {
+    .addUserDialog, .add, .close {
         display: flex;
+        border-radius: 24px;
+        border: none;
+        padding: 12px;
+        margin-left: 10px;
+        cursor: pointer;
     }
 
     dialog input {
@@ -150,46 +153,15 @@
         transition: all 0.2s;
     }
 
-    dialog input:hover, 
-    dialog input:active,
-    dialog input:focus {
-        border: 2px solid #1751d0;
-        transition: all 0.2s;
-    }
-
-    dialog .add {
-        display: flex;
-        border-radius: 24px;
-        border: none;
-        padding: 12px;
-        margin-left: 10px;
-        cursor: pointer;
-    }
-
-    dialog .close {
-        display: flex;
-        border-radius: 24px;
-        border: none;
-        padding: 12px;
-        margin-left: 10px;
-        cursor: pointer;
-    }
-
-    .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        margin-right: 10px;
-        border: 3px solid #e9e9eb;
-        background-color: #1751d0;
-    }
+        dialog input:hover, dialog input:active, dialog input:focus {
+            border: 2px solid #1751d0;
+            transition: all 0.2s;
+        }
 
     .message-container {
         display: flex;
         align-items: center;
-        padding: 10px;
-        padding-top: 5px;
-        padding-bottom: 5px;
+        padding: 5px 10px;
     }
 
     .message-image {
@@ -205,17 +177,17 @@
         text-align: right;
     }
 
-    .message-container.sent .avatar {
-        order: 2;
-        margin-left: 10px;
-        margin-right: 0;
-    }
+        .message-container.sent .avatar {
+            order: 2;
+            margin-left: 10px;
+            margin-right: 0;
+        }
 
-    .message-container.sent .message-content {
-        order: 1;
-    }
+        .message-container.sent .message-content {
+            order: 1;
+        }
 
-    .message-container .message-content {
+    .message-content {
         background-color: #e9e9eb;
         border-radius: 10px;
         color: black;
@@ -224,7 +196,11 @@
         word-wrap: break-word;
     }
 
-    .message-container .message-file {
+    .message-container.sent .message-content {
+        background-color: #daf5d5;
+    }
+
+    .message-file {
         background-color: white;
         border-radius: 10px;
         padding: 10px;
@@ -235,18 +211,17 @@
     }
 
     #messageInput {
-        padding-left: 18px;
-        padding: 10px;
-        border:none;
+        padding: 10px 18px 10px 10px;
+        border: none;
         background-color: transparent;
         outline: none;
         width: 100%;
-        box-sizing: border-box; /* Added this line */
+        box-sizing: border-box;
     }
 
-    #messageInput::placeholder {
-        color: #ccc;
-    }
+        #messageInput::placeholder {
+            color: #ccc;
+        }
 
     .context-menu {
         background-color: #f9f9f9;
@@ -260,20 +235,19 @@
         margin: 0;
     }
 
-    .menu-list li {
-        padding: 8px 12px;
-        cursor: pointer;
-    }
+        .menu-list li {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
 
-    .menu-list li:hover {
-        background-color: #f0f0f0;
-    }
+            .menu-list li:hover {
+                background-color: #f0f0f0;
+            }
 
     #messages-header {
         display: flex;
         align-items: center;
-        padding-left: 15px;
-        margin-bottom: 0px;
+        padding: 0 10px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -282,54 +256,50 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 85px;
-        margin-top: 10px;
+        margin: 10px 0 85px;
     }
 </style>
 
-
-    <div class="container">
-        <div class="main-container">
-            <div style="display: flex; flex-direction:column; width: 30%;">
-                <h1 id="messages-header">Messages</h1>
-                <div class="contacts-container" id="contactsContainer"></div>
+<div class="container">
+    <div class="main-container">
+        <div style="display: flex; flex-direction: column; width: 30%;">
+            <h1 id="messages-header">Messages</h1>
+            <div class="contacts-container" id="contactsContainer"></div>
+        </div>
+        <div class="chat-area">
+            <div class="content">
+                <ul id="messagesList"></ul>
             </div>
-            <div class="test">
-                <div class="content">
-                    <ul id="messagesList"></ul>
+            <div class="bottom-msg-input">
+                <div class="input-container">
+                    <input type="file" id="fileInput" />
+                    <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
+                    <input type="text" class="w-100" id="messageInput" placeholder="Message" />
+                    <button type="button" id="sendButton" disabled><i class="material-icons">arrow_upward</i>
+                    </button>
                 </div>
-                <div class="bottom-msg-input">
-                    <div class="input-container">
-                        <input type="file" id="fileInput" />
-                        <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
-                        <input type="text" class="w-100" id="messageInput" placeholder="Message" />
-                        <button type="button" id="sendButton" disabled><i class="material-icons">send</i></button>
-                    </div>
-                </div>
-                <dialog id="dialog">
-                    <div class="addUserDialog">
-                        <input type="text" id="contactEmailInput" placeholder="Email" />
-                        <button class="add" id="addContactButton"><i class="material-icons">add</i></button>
-                        <button class="close"><i class="material-icons">close</i></button>
-                    </div>
-                </dialog>
-
-                <dialog id="updateDialog">
-                    <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name" />
-                    <button id="saveDisplayNameButton"><i class="material-icons">save</i></button>
+            </div>
+            <dialog id="dialog">
+                <div class="addUserDialog">
+                    <input type="text" id="contactEmailInput" placeholder="Email" />
+                    <button class="add" id="addContactButton"><i class="material-icons">add</i></button>
                     <button class="close"><i class="material-icons">close</i></button>
-                </dialog>
-
-                <div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
+                </div>
+            </dialog>
+            <dialog id="updateDialog">
+                <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name" />
+                <button id="saveDisplayNameButton"><i class="material-icons">save</i></button>
+                <button class="close"><i class="material-icons">close</i></button>
+            </dialog>
+            <div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
                 <ul class="menu-list">
                     <li id="editName">Edit Name</li>
                     <li id="deleteContact">Delete Contact</li>
                 </ul>
             </div>
-            </div>
         </div>
     </div>
-
+</div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>

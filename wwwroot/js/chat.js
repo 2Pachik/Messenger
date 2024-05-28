@@ -27,20 +27,28 @@ connection.on("ReceiveMessage", function (user, message, avatar) {
     img.src = avatar;
     img.classList.add("avatar");
 
-    var text = document.createElement("span");
-    if (user != "You") {
-        text.textContent = `${user} : ${message}`;
-    } else {
-        text.textContent = `${message}`;
+    var messageContent = document.createElement("div");
+    messageContent.classList.add("message-content");
+
+    if (user !== "You") {
+        var username = document.createElement("div");
+        username.textContent = user;
+        username.style.color = "#469af4";
+        username.style.fontWeight = "bold";
+        messageContent.appendChild(username);
     }
-    text.classList.add("message-content");
+
+    var text = document.createElement("div");
+    text.textContent = message + " " + message.sentAt;
+    messageContent.appendChild(text);
 
     container.appendChild(img);
-    container.appendChild(text);
+    container.appendChild(messageContent);
 
     li.appendChild(container);
     document.getElementById("messagesList").appendChild(li);
 });
+
 
 connection.on("ReceiveFile", function (user, filePath, avatar) {
     var li = document.createElement("li");
@@ -329,6 +337,22 @@ function openUpdateDialog(contactEmail) {
 function closeUpdateDialog() {
     var dialog = document.getElementById("updateDialog");
     dialog.close();
+}
+
+connection.on("ContactUpdated", function (contact) {
+    updateContactDisplayName(contact);
+});
+
+function updateContactDisplayName(contact) {
+    var contactButtons = document.querySelectorAll(".contact-button");
+    contactButtons.forEach(function (button) {
+        if (button.getAttribute("data-email") === contact.email) {
+            var displayNameElement = button.querySelector(".contact-name");
+            displayNameElement.textContent = contact.displayName;
+
+            loadChatHistory(contact.email);
+        }
+    });
 }
 
 document.getElementById("saveDisplayNameButton").addEventListener("click", function (event) {

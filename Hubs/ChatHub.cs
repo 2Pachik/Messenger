@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 
 namespace WebApplication1.Hubs
 {
@@ -238,11 +239,14 @@ namespace WebApplication1.Hubs
                 existingContact.DisplayName = newDisplayName;
                 _context.Contacts.Update(existingContact);
                 await _context.SaveChangesAsync();
-                await Clients.Caller.SendAsync("ContactUpdated", new ContactVM
+
+                var contactVM = new ContactVM
                 {
                     Email = contactEmail,
                     DisplayName = newDisplayName
-                });
+                };
+
+                await Clients.Caller.SendAsync("ContactUpdated", contactVM);
             }
         }
 
