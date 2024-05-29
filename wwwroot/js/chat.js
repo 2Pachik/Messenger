@@ -388,6 +388,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelector("#dialog .close").addEventListener("click", closeDialog);
     document.querySelector("#updateDialog .close").addEventListener("click", closeUpdateDialog);
+
+    const contactField = document.getElementById("contacts-field");
+    const fixedButton = document.getElementById("show");
+
+    contactField.addEventListener("mouseenter", function () {
+        fixedButton.classList.add("no-hidden");
+    });
+
+    contactField.addEventListener("mouseleave", function () {
+        fixedButton.classList.remove("no-hidden");
+    });
 });
 
 // Удаление старого обработчика контекстного меню
@@ -446,5 +457,25 @@ document.getElementById("deleteContact").addEventListener("click", function () {
     contextMenu.style.display = "none";
 });
 
+function filterContacts() {
+    var input = document.getElementById("search");
+    var filter = input.value.toLowerCase();
+    var contacts = document.getElementById("contactsContainer").getElementsByClassName("contact-button");
 
+    for (var i = 0; i < contacts.length; i++) {
+        var contactName = contacts[i].getElementsByClassName("contact-name")[0].textContent;
+        if (contactName.toLowerCase().indexOf(filter) > -1) {
+            contacts[i].style.display = "";
+        } else {
+            contacts[i].style.display = "none";
+        }
+    }
 
+    // Добавляем/удаляем класс active в зависимости от наличия текста в поле ввода
+    var searchContainer = document.getElementById("searchContainer");
+    if (filter.length > 0) {
+        searchContainer.classList.add("active");
+    } else {
+        searchContainer.classList.remove("active");
+    }
+}

@@ -300,7 +300,7 @@
     .fixed-button {
         display: flex;
         position: absolute;
-        bottom: 80px; /* Расположение кнопки от нижнего края */
+        bottom: 0px; /* Расположение кнопки от нижнего края */
         right: 20px; /* Расположение кнопки от правого края */
         background-color: #007bff;
         color: white;
@@ -345,14 +345,35 @@
         color: #b2b5b7;
         padding-left: 5px;
     }
+
+    .search-container.active #searchIcon {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .search-container.active #search {
+        width: 100%;
+        transition: width 0.3s ease;
+    }
+
+    #contacts-field {
+        display: flex;
+        flex-direction: column;
+        width: 30%;
+        position: relative;
+    }
+
+    .fixed-button.no-hidden {
+        bottom: 80px; /* Расположение кнопки от нижнего края */
+    }
 </style>
 
     <div class="main-container">
-    <div style="display: flex; flex-direction: column; width: 30%; position: relative;">
+    <div id="contacts-field">
             @* <h4 id="messages-header">All messages</h4> *@
             <div class="search-container">
                 <i id="searchIcon" class="material-icons">search</i>
-                <input id="search" placeholder="Search" />
+                <input id="search" placeholder="Search" oninput="filterContacts()" />
             </div>
             <div class="contacts-container" id="contactsContainer"></div>
             <button class="fixed-button" id="show"><i class="material-icons">edit</i></button>
