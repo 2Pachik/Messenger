@@ -1,6 +1,4 @@
-﻿@page
-
-<script>
+﻿<script>
     const username = "@User.Identity!.Name";
 </script>
 
@@ -17,18 +15,15 @@
         display: flex;
         flex-direction: column;
         overflow-y: auto;
-        padding-top: 0px;
-        padding-right: 10px;
-        padding-bottom: 0px;
-        padding-left: 10px;
+        padding: 10px;
+        padding-top: 0;
     }
 
     .contact-button {
-        background-color: #f8f9fa;
+        background-color: white;
         border: none;
         border-radius: 10px;
         padding: 10px;
-        margin: 5px 0;
         text-align: left;
         cursor: pointer;
         transition: all 0.2s;
@@ -44,14 +39,14 @@
             background-color: #ddd;
         }
 
-    .active-contact {
-        background-color: #007bff;
+    .active-contact,
+    .active-contact:hover {
+        background-color: #3390ec;
         color: white;
     }
 
     .contact-avatar, .avatar {
         border-radius: 50%;
-        border: 3px solid #e9e9eb;
         background-color: #1751d0;
         flex-shrink: 0;
     }
@@ -71,7 +66,6 @@
     .contact-name {
         flex-grow: 1;
         overflow: hidden;
-        text-overflow: ellipsis;
     }
 
     .chat-area {
@@ -293,6 +287,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        margin-bottom: 0px;
     }
 
     .bottom-msg-input {
@@ -301,12 +296,66 @@
         justify-content: center;
         margin: 10px 0 85px;
     }
+
+    .fixed-button {
+        display: flex;
+        position: absolute;
+        bottom: 80px; /* Расположение кнопки от нижнего края */
+        right: 20px; /* Расположение кнопки от правого края */
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 15px;
+        cursor: pointer;
+        z-index: 1000; /* Высокий z-index для отображения поверх других элементов */
+        border-radius: 50%;
+        transition: all .3s;
+    }
+
+    .fixed-button:hover,
+    .fixed-button:active {
+        background-color: #1751d0;
+        transition: all .3s;
+    }
+
+    .search-container {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: #f4f4f5;
+        border-radius: 24px;
+        margin: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #search {
+        background-color: transparent;
+        border: none;
+        outline: none;
+        color: #a3adb5;
+        padding-left: 10px;
+    }
+
+    #search::placeholder {
+        color: #a3adb5;
+    }
+
+    #searchIcon {
+        color: #b2b5b7;
+        padding-left: 5px;
+    }
 </style>
 
     <div class="main-container">
-        <div style="display: flex; flex-direction: column; width: 30%;">
-            <h1 id="messages-header">Messages</h1>
+    <div style="display: flex; flex-direction: column; width: 30%; position: relative;">
+            @* <h4 id="messages-header">All messages</h4> *@
+            <div class="search-container">
+                <i id="searchIcon" class="material-icons">search</i>
+                <input id="search" placeholder="Search" />
+            </div>
             <div class="contacts-container" id="contactsContainer"></div>
+            <button class="fixed-button" id="show"><i class="material-icons">edit</i></button>
         </div>
         <div class="chat-area">
             <div class="content">
