@@ -9,6 +9,7 @@
         display: flex;
         flex-direction: row;
         height: 100vh;
+        width: 100vw;
     }
 
     .contacts-container {
@@ -16,7 +17,10 @@
         display: flex;
         flex-direction: column;
         overflow-y: auto;
+        padding-top: 0px;
         padding-right: 10px;
+        padding-bottom: 0px;
+        padding-left: 10px;
     }
 
     .contact-button {
@@ -46,13 +50,22 @@
     }
 
     .contact-avatar, .avatar {
-        width: 32px;
-        height: 32px;
         border-radius: 50%;
-        margin-right: 10px;
         border: 3px solid #e9e9eb;
         background-color: #1751d0;
         flex-shrink: 0;
+    }
+
+    .contact-avatar {
+        width: 48px;
+        height: 48px;
+        margin-right: 10px;
+    }
+
+    .avatar {
+        width: 32px;
+        height: 32px;
+        margin-right: 5px;
     }
 
     .contact-name {
@@ -68,12 +81,21 @@
         overflow: hidden;
         background-image: radial-gradient(circle at top left, rgb(212, 218, 185), transparent), radial-gradient(circle at top right, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom left, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom right, rgb(209, 214, 141), transparent), url("https://localhost:7262/resources/pattern.svg");
         border-left: 2px solid #dddddd;
-        max-width: 60%;
+        max-width: 70%;
     }
 
     .content {
         overflow-y: auto;
         height: calc(100% - 140px);
+        overflow-x: none;
+    }
+
+    .messages {
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: column;
+        margin-left: 100px;
+        margin-right: 100px;
     }
 
     .input-container {
@@ -179,7 +201,7 @@
 
         .message-container.sent .avatar {
             order: 2;
-            margin-left: 10px;
+            margin-left: 5px;
             margin-right: 0;
         }
 
@@ -196,7 +218,6 @@
         border-top-right-radius: 10px;
         color: black;
         padding: 10px;
-        padding-left: 15px;
         max-width: 70%;
         word-wrap: break-word;
         line-height: 1.3125;
@@ -282,7 +303,6 @@
     }
 </style>
 
-<div class="container">
     <div class="main-container">
         <div style="display: flex; flex-direction: column; width: 30%;">
             <h1 id="messages-header">Messages</h1>
@@ -290,7 +310,9 @@
         </div>
         <div class="chat-area">
             <div class="content">
-                <ul id="messagesList"></ul>
+                <div class="messages">
+                    <ul id="messagesList"></ul>
+                </div>
             </div>
             <div class="bottom-msg-input">
                 <div class="input-container">
@@ -321,7 +343,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
