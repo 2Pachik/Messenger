@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using static System.Net.WebRequestMethods;
 
 namespace WebApplication1.Models
 {

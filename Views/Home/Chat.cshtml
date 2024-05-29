@@ -1,7 +1,8 @@
-﻿<script>
+﻿@page
+
+<script>
     const username = "@User.Identity!.Name";
 </script>
-
 <style>
     .main-container {
         display: flex;
@@ -34,10 +35,10 @@
         text-overflow: ellipsis;
     }
 
-        .contact-button:hover {
-            color: black;
-            background-color: #ddd;
-        }
+    .contact-button:hover {
+        color: black;
+        background-color: #ddd;
+    }
 
     .active-contact,
     .active-contact:hover {
@@ -76,12 +77,25 @@
         background-image: radial-gradient(circle at top left, rgb(212, 218, 185), transparent), radial-gradient(circle at top right, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom left, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom right, rgb(209, 214, 141), transparent), url("https://localhost:7262/resources/pattern.svg");
         border-left: 2px solid #dddddd;
         max-width: 70%;
+        margin-bottom: 0px;
     }
 
     .content {
         overflow-y: auto;
-        height: calc(100% - 140px);
-        overflow-x: none;
+        /* height: calc(100% - 140px); */
+        height: 100%;
+        overflow-x: hidden;
+    }
+
+    .content::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+
+    /* Для Firefox */
+    .content {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
     }
 
     .messages {
@@ -121,22 +135,18 @@
         transition: color 0.3s;
     }
 
-/*     #uploadButton {
-        transform: rotate(45deg);
-    } */
+    #sendButton:disabled, #uploadButton:disabled {
+        background-color: transparent;
+    }
 
-        #sendButton:disabled, #uploadButton:disabled {
-            background-color: transparent;
-        }
+    #sendButton:hover:enabled, #uploadButton:hover:enabled, #sendButton:enabled {
+        color: #3390ec;
+        transition: all 0.3s;
+    }
 
-        #sendButton:hover:enabled, #uploadButton:hover:enabled, #sendButton:enabled {
-            color: #3390ec;
-            transition: all 0.3s;
-        }
-
-        #sendButton i, #uploadButton i {
-            font-size: 24px;
-        }
+    #sendButton i, #uploadButton i {
+        font-size: 24px;
+    }
 
     ul#messagesList {
         padding-left: 0;
@@ -169,67 +179,104 @@
         transition: all 0.2s;
     }
 
-        dialog input:hover, dialog input:active, dialog input:focus {
-            border: 2px solid #1751d0;
-            transition: all 0.2s;
-        }
+    dialog input:hover, dialog input:active, dialog input:focus {
+        border: 2px solid #1751d0;
+        transition: all 0.2s;
+    }
 
     .message-container {
         display: flex;
         align-items: flex-end;
-        padding: 5px 10px;
+        padding: 2px 10px;
+        margin-left: 100px;
+        margin-right: 300px;
     }
 
     .message-image {
         max-width: 200px;
         max-height: 200px;
-        margin-left: 10px;
-        border-radius: 10px;
-        border: 5px solid #e9e9eb;
+        background-color: white;
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+        border-top-right-radius: 18px;
+    }
+
+    .message-image.sent {
+        max-width: 200px;
+        max-height: 200px;
+        border-bottom-left-radius: 18px;
+        border-top-left-radius: 18px;
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 18px;
     }
 
     .message-container.sent {
         justify-content: flex-end;
         text-align: right;
+        margin-left: 300px;
+        margin-right: 100px;
     }
 
-        .message-container.sent .avatar {
-            order: 2;
-            margin-left: 5px;
-            margin-right: 0;
-        }
+    .message-container.sent .avatar {
+        order: 2;
+        margin-left: 5px;
+        margin-right: 0;
+    }
 
-        .message-container.sent .message-content {
-            order: 1;
-        }
+    .message-container.sent .message-content {
+        order: 1;
+    }
 
     .message-content {
         font-size: 14px;
         background-color: #e9e9eb;
-        border-bottom-left-radius: 30px;
-        border-top-left-radius: 30px;
-        border-bottom-right-radius: 10px;
-        border-top-right-radius: 10px;
+        border-bottom-left-radius: 18px;
+        border-top-left-radius: 18px;
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 18px;
         color: black;
         padding: 10px;
-        max-width: 70%;
-        word-wrap: break-word;
+        max-width: fit-content;
+        min-width: fit-content;
+        word-break: break-word;
         line-height: 1.3125;
+        text-align: left;
     }
 
     .message-content-contact {
         font-size: 14px;
-        background-color: #e9e9eb;
-        border-bottom-left-radius: 10px;
-        border-top-left-radius: 10px;
-        border-bottom-right-radius: 30px;
-        border-top-right-radius: 30px;
+        background-color: white;
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+        border-top-right-radius: 18px;
         color: black;
         padding: 10px;
         padding-right: 15px;
-        max-width: 70%;
-        word-wrap: break-word;
+        max-width: fit-content;
+        min-width: fit-content;
+        word-break: break-word;
         line-height: 1.3125;
+        text-align: left;
+    }
+
+    .message-content-contact-image {
+        display: flex;
+        flex-direction: column;
+        font-size: 14px;
+        background-color: white;
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+        border-top-right-radius: 18px;
+        color: black;
+        padding: 10px;
+        max-width: fit-content;
+        min-width: fit-content;
+        word-break: break-word;
+        line-height: 1.3125;
+        text-align: left;
     }
 
     .message-container.sent .message-content {
@@ -238,12 +285,26 @@
 
     .message-file {
         background-color: white;
-        border-radius: 10px;
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+        border-top-right-radius: 18px;
         padding: 10px;
         max-width: 70%;
         word-wrap: break-word;
         display: inline-block;
-        margin-left: 10px;
+    }
+
+    .message-file.sent {
+        background-color: #daf5d5;
+        border-bottom-left-radius: 18px;
+        border-top-left-radius: 18px;
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 18px;
+        padding: 10px;
+        max-width: 70%;
+        word-wrap: break-word;
+        display: inline-block;
     }
 
     #messageInput {
@@ -255,14 +316,26 @@
         box-sizing: border-box;
     }
 
-        #messageInput::placeholder {
-            color: #ccc;
-        }
+    #messageInput::placeholder {
+        color: #ccc;
+    }
 
     .context-menu {
         background-color: #f9f9f9;
         border: 2px solid #ccc;
         padding: 10px;
+    }
+
+    .user-context-menu {
+        display: none;
+        position: absolute;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        border-radius: 12px;
     }
 
     .menu-list {
@@ -271,14 +344,20 @@
         margin: 0;
     }
 
-        .menu-list li {
-            padding: 8px 12px;
-            cursor: pointer;
-        }
+    .menu-list li {
+        align-items: center;
+        display: flex;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 12px;
+        transition: all .3s;
+    }
 
-            .menu-list li:hover {
-                background-color: #f0f0f0;
-            }
+    .menu-list li:hover {
+        background-color: #3390ec;
+        color: white;
+        transition: all .3s;
+    }
 
     #messages-header {
         display: flex;
@@ -294,15 +373,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 10px 0 85px;
+        margin-bottom: 10px;
     }
 
     .fixed-button {
         display: flex;
         position: absolute;
-        bottom: 0px; /* Расположение кнопки от нижнего края */
+        bottom: -500px; /* Расположение кнопки от нижнего края */
         right: 20px; /* Расположение кнопки от правого края */
-        background-color: #007bff;
+        background-color: #3390ec;
         color: white;
         border: none;
         padding: 15px;
@@ -327,6 +406,7 @@
         margin: 10px;
         overflow: hidden;
         text-overflow: ellipsis;
+        width: 100%;
     }
 
     #search {
@@ -335,6 +415,7 @@
         outline: none;
         color: #a3adb5;
         padding-left: 10px;
+        width: 100%;
     }
 
     #search::placeholder {
@@ -364,25 +445,105 @@
     }
 
     .fixed-button.no-hidden {
-        bottom: 80px; /* Расположение кнопки от нижнего края */
+        bottom: 20px; /* Расположение кнопки от нижнего края */
+    }
+
+    .chat-header {
+        display: flex;
+        position: absolute;
+        z-index: 900;
+        width: 100%;
+        align-items: center;
+        padding: 20px;
+        display: flex;
+        margin-bottom: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px); /* For Safari */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-menu {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    #burger {
+        display: flex;
+        border-radius: 50%;
+        padding: 10px;
+        color: #aeb7be;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        margin-left: 10px;
+        transition: all 0.3s;
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+
+    #burger:hover,
+    #burger:active,
+    #burger:focus {
+        background-color: #f4f4f5;
+        transition: all 0.3s;
+    }
+
+    @@media (max-width: 800px) {
+        #contacts-field {
+            display: none;
+        }
+
+        .chat-area {
+            max-width: 100%;
+        }
+    }
+
+    @@media (max-width: 1000px) {
+        .input-container {
+            width: 97%;
+        }
+
+        .message-container {
+            margin-left: 0px;
+            margin-right: 100px;
+        }
+
+        .message-container.sent {
+            margin-left: 100px;
+            margin-right: 0px;
+        }
     }
 </style>
 
-    <div class="main-container">
-    <div id="contacts-field">
+<div class="main-container">
+        <div id="contacts-field">
             @* <h4 id="messages-header">All messages</h4> *@
-            <div class="search-container">
-                <i id="searchIcon" class="material-icons">search</i>
-                <input id="search" placeholder="Search" oninput="filterContacts()" />
+            <div class="user-menu">
+                <button id="burger"><i class="material-icons">menu</i></button>
+                <div id="userContextMenu" class="user-context-menu">
+                    <ul class="menu-list">
+                    <li><i class="material-icons" style="margin-right: 10px; font-size: 20px; color: #a3adb5;">account_circle</i>@User.Identity!.Name</li>
+                    <li><i class="material-icons" style="margin-right: 10px; font-size: 20px; color: #a3adb5;">edit</i>Edit profile image</li>
+                    <li><i class="material-icons" style="margin-right: 10px; font-size: 20px; color: #a3adb5;">logout</i>Log out</li>
+                    </ul>
+                </div>
+                <div id="daun" class="search-container">
+                    <i id="searchIcon" class="material-icons">search</i>
+                    <input id="search" placeholder="Search" oninput="filterContacts()" />
+                </div>
             </div>
             <div class="contacts-container" id="contactsContainer"></div>
             <button class="fixed-button" id="show"><i class="material-icons">edit</i></button>
         </div>
         <div class="chat-area">
+        <div class="chat-header">
+                <img src="https://localhost:7262/resources/1.png" height="32" width="32" style="border-radius: 50%;"/>
+                <div id="user-header" style="padding-left: 10px; font-weight: bold;"></div>
+            </div>
             <div class="content">
-                <div class="messages">
-                    <ul id="messagesList"></ul>
-                </div>
+                <ul id="messagesList"></ul>
             </div>
             <div class="bottom-msg-input">
                 <div class="input-container">
@@ -412,7 +573,34 @@
                 </ul>
             </div>
         </div>
-    </div>
+</div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
+
+<script>
+    document.getElementById('burger').addEventListener('click', function (event) {
+        const menu = document.getElementById('userContextMenu');
+        const burger = document.getElementById('burger');
+        const isVisible = menu.style.display === 'block';
+
+        // Переключаем видимость меню
+        menu.style.display = isVisible ? 'none' : 'block';
+
+        // Позиционирование меню в месте клика (можно адаптировать)
+        const rect = burger.getBoundingClientRect();
+        menu.style.top = rect.bottom + "px";
+        menu.style.left = rect.left + "px";
+
+        console.log(rect.left, rect.top);
+
+        // Предотвращаем стандартное поведение и всплывание событий
+        event.preventDefault();
+        event.stopPropagation();
+    });
+
+    // Скрываем меню при клике вне его
+    window.addEventListener('click', function () {
+        document.getElementById('userContextMenu').style.display = 'none';
+    });
+</script>

@@ -138,19 +138,42 @@ connection.on("ChatHistory", function (messages) {
             var messageContainer = document.createElement("div");
             var username_ = document.createElement("div");
             var text = document.createElement("div");
+            var time = document.createElement("span");
             if (message.email === username) {
-                text.textContent = `${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                text.textContent = `${message.content}`;
+                //text.textContent = `${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
                 text.classList.add("message-content");
+
+                time.style.position = "relative";
+                time.style.fontSize = "10px";
+                time.style.top = "10px";
+                time.style.left = "5px";
+                time.style.float = "right";
+                time.style.color = "#56b762";
+                time.textContent = new Date(message.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                text.appendChild(time);
                 container.appendChild(img);
                 container.appendChild(text);
             } else {
                 messageContainer.classList.add("message-content-contact");
                 username_.textContent = message.displayName;
-                username_.style.color = "#469af4";
+                username_.style.color = "#3390ec";
                 username_.style.fontWeight = "bold";
                 messageContainer.appendChild(username_);
-                text.textContent = `${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                text.textContent = `${message.content}`;
+                //text.textContent = `${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
                 messageContainer.appendChild(text);
+
+                time.style.position = "relative";
+                time.style.fontSize = "10px";
+                time.style.top = "10px";
+                time.style.left = "5px";
+                time.style.float = "right";
+                time.style.color = "#9c9fa2";
+                time.textContent = new Date(message.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                text.appendChild(time);
+
                 container.appendChild(img);
                 container.appendChild(messageContainer);
             }
@@ -159,28 +182,61 @@ connection.on("ChatHistory", function (messages) {
             var isImage = ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(fileExtension);
 
             if (isImage) {
+                var messageContainer = document.createElement("div");
+                messageContainer.style.position = "relative";
+                messageContainer.style.display = "inline-block";
                 var image = document.createElement("img");
                 image.src = message.content;
                 image.classList.add("message-image");
-                container.appendChild(img);
-                container.appendChild(image);
-            } else {
-                var link = document.createElement("a");
-                link.href = message.content;
                 if (message.email === username) {
-                    link.textContent = `${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
-                } else {
-                    link.textContent = `${message.displayName} : ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
+                    image.classList.add("sent");
+                    image.style.display = "block";
+                    var time = document.createElement("span");
+                    time.style.position = "absolute";
+                    time.style.fontSize = "10px";
+                    time.style.color = "white";
+                    time.style.top = "87%";
+                    time.style.left = "82.5%";
+                    time.style.backgroundColor = "rgb(0, 0, 0, 0.5)"
+                    time.style.borderRadius = "5px"
+                    time.style.paddingLeft = "3px"
+                    time.style.paddingRight = "3px"
+                    time.textContent = new Date(message.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    messageContainer.appendChild(image);
+                    messageContainer.appendChild(time);
+                    container.appendChild(img);
+                    container.appendChild(messageContainer);
                 }
-                link.target = "_blank";
-                link.classList.add("message-file");
-                container.appendChild(img);
-                container.appendChild(link);
+                else {
+                    var time = document.createElement("span");
+                    time.style.position = "relative";
+                    time.style.fontSize = "10px";
+                    time.style.top = "5px";
+                    time.style.textAlign = "right";
+                    time.style.color = "#9c9fa2";
+                    time.textContent = new Date(message.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    container.appendChild(img);
+                    container.appendChild(image);
+                }
             }
+        } else {
+            var link = document.createElement("a");
+            link.href = message.content;
+            if (message.email === username) {
+                link.textContent = `${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
+            } else {
+                link.textContent = `${message.displayName} : ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
+            }
+            link.target = "_blank";
+            link.classList.add("message-file");
+            container.appendChild(img);
+            container.appendChild(link);
         }
 
         li.appendChild(container);
         messagesList.appendChild(li);
+
+        scrollToBottom();
     });
 });
 
@@ -379,6 +435,9 @@ document.getElementById("saveDisplayNameButton").addEventListener("click", funct
 document.addEventListener("DOMContentLoaded", function () {
     // Отключаем кнопку отправки при загрузке страницы
     document.getElementById("sendButton").disabled = true;
+    var chatTitle = document.getElementById("user-header");
+
+    chatTitle.style.display = "none";
 
     // Обработчик для включения/выключения кнопки отправки
     document.getElementById("messageInput").addEventListener("input", function () {
@@ -478,4 +537,9 @@ function filterContacts() {
     } else {
         searchContainer.classList.remove("active");
     }
+}
+
+function scrollToBottom() {
+    const content = document.querySelector('.content');
+    content.scrollTop = content.scrollHeight;
 }

@@ -14,15 +14,14 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
 </head>
 <body class="inter-regular">
-    <header class="inter-semibold-16">
+    @* <header class="inter-semibold-16">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
-            <div class="container">
+            
                 <div class="main-logo">
                    <img src="~/logo.ico" width="32" height="32">
-                   <div>BlinkTalk</div>
                 </div>
 @*                 <a class="navbar-brand" asp-area="" asp-controller="Account" asp-action="Login">BlinkTalk</a>
- *@                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -33,18 +32,17 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li> *@
+                        </li> 
                     </ul>
                     <partial name="_LoginPartial"/>
                 </div>
-            </div>
         </nav>
-    </header>
+    </header> *@
 
 
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -80,6 +78,7 @@
         align-content: center;
         justify-content: center;
         align-items: center;
+        margin-left: 10px;
     }
 </style>
 
