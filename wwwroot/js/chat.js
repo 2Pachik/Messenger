@@ -91,6 +91,11 @@ connection.on("ReceiveFile", function (user, filePath, avatar) {
 connection.on("LoadContacts", function (contacts) {
     var contactsContainer = document.getElementById("contactsContainer");
     document.getElementById("show").addEventListener("click", openDialog);
+
+    if (contacts == null) {
+
+    }
+
     contacts.forEach(function (contact) {
         var button = document.createElement("button");
         button.className = "contact-button";
@@ -108,6 +113,12 @@ connection.on("LoadContacts", function (contacts) {
         button.appendChild(displayName);
 
         button.onclick = function () {
+            var chatHeaderImg = document.getElementById("chatHeaderImg");
+            var userNameHeader = document.getElementById("user-header");
+            var chatHeader = document.getElementById("chat-header");
+            chatHeaderImg.src = contact.avatarPath;
+            userNameHeader.textContent = button.textContent;
+            chatHeader.style.display = "flex";
             loadChatHistory(contact.email);
             currentReceiverEmail = contact.email;
             setActiveContact(button);
@@ -195,8 +206,8 @@ connection.on("ChatHistory", function (messages) {
                     time.style.position = "absolute";
                     time.style.fontSize = "10px";
                     time.style.color = "white";
-                    time.style.top = "87%";
-                    time.style.left = "82.5%";
+                    time.style.bottom = "5px";
+                    time.style.right = "5px";
                     time.style.backgroundColor = "rgb(0, 0, 0, 0.5)"
                     time.style.borderRadius = "5px"
                     time.style.paddingLeft = "3px"
@@ -415,7 +426,9 @@ function updateContactDisplayName(contact) {
     contactButtons.forEach(function (button) {
         if (button.getAttribute("data-email") === contact.email) {
             var displayNameElement = button.querySelector(".contact-name");
+            var chatName = document.getElementById("user-header");
             displayNameElement.textContent = contact.displayName;
+            chatName.textContent = contact.displayName;
 
             loadChatHistory(contact.email);
         }
@@ -435,9 +448,6 @@ document.getElementById("saveDisplayNameButton").addEventListener("click", funct
 document.addEventListener("DOMContentLoaded", function () {
     // Отключаем кнопку отправки при загрузке страницы
     document.getElementById("sendButton").disabled = true;
-    var chatTitle = document.getElementById("user-header");
-
-    chatTitle.style.display = "none";
 
     // Обработчик для включения/выключения кнопки отправки
     document.getElementById("messageInput").addEventListener("input", function () {
@@ -472,31 +482,57 @@ document.removeEventListener("contextmenu", function (event) {
 const contextMenu = document.getElementById("contextMenu");
 
 document.addEventListener("contextmenu", function (event) {
-    let target = event.target;
+    event.preventDefault();  // Предотвращение стандартного контекстного меню
+    const contextMenu = document.querySelector('.context-menu');
 
-    // Проверяем, был ли клик на аватарке или имени контакта, и поднимаемся до родителя с классом 'contact-button'
+    // Проверка цели клика и поднятие до родителя с классом 'contact-button'
+    let target = event.target;
     if (target.classList.contains("contact-avatar") || target.classList.contains("contact-name")) {
         target = target.closest(".contact-button");
     }
 
     if (target && target.classList.contains("contact-button")) {
-        event.preventDefault();
-        contextMenu.style.display = "block";
-        contextMenu.style.left = `${event.pageX}px`;
-        contextMenu.style.top = `${event.pageY}px`;
-
-        // Сохраняем email контакта в data-атрибуте для последующего использования
-        contextMenu.setAttribute("data-email", target.getAttribute("data-email"));
+        // Проверяем, отображается ли меню
+        if (contextMenu.classList.contains('show')) {
+            // Скрываем с анимацией, затем показываем снова
+            contextMenu.classList.replace('show', 'hide');
+            setTimeout(() => {
+                showContextMenu(event, target, contextMenu);
+            }, 100); // Соответствует длительности анимации скрытия
+        } else {
+            showContextMenu(event, target, contextMenu);
+        }
     } else {
-        contextMenu.style.display = "none";
+        // Скрываем меню, если клик был вне контекста контакта
+        contextMenu.classList.replace('show', 'hide');
+        setTimeout(() => {
+            contextMenu.style.display = 'none';
+            contextMenu.classList.remove('hide');
+        }, 100);
     }
 });
 
+// Функция для отображения контекстного меню
+function showContextMenu(event, target, menu) {
+    menu.style.display = "block";
+    menu.style.left = `${event.pageX}px`;
+    menu.style.top = `${event.pageY}px`;
+    menu.style.transformOrigin = 'top left'; // Устанавливаем origin для анимации
+    menu.classList.remove('hide');
+    menu.classList.add('show');
+
+    // Сохранение email контакта в data-атрибуте для последующего использования
+    menu.setAttribute("data-email", target.getAttribute("data-email"));
+}
 
 // Скрыть контекстное меню при клике в любом другом месте
 document.addEventListener("click", function (e) {
     if (!contextMenu.contains(e.target)) {
-        contextMenu.style.display = "none";
+        contextMenu.classList.replace("show", "hide");
+        setTimeout(() => {
+            contextMenu.style.display = 'none';
+            contextMenu.classList.remove('hide');
+        }, 100);
     }
 });
 
@@ -538,7 +574,6 @@ function filterContacts() {
         searchContainer.classList.remove("active");
     }
 }
-
 function scrollToBottom() {
     const content = document.querySelector('.content');
     content.scrollTop = content.scrollHeight;

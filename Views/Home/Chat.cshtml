@@ -22,12 +22,13 @@
 
     .contact-button {
         background-color: white;
+        color: #707579;
         border: none;
+        outline: none;
         border-radius: 10px;
         padding: 10px;
         text-align: left;
         cursor: pointer;
-        transition: all 0.2s;
         display: flex;
         align-items: center;
         white-space: nowrap;
@@ -35,16 +36,20 @@
         text-overflow: ellipsis;
     }
 
-    .contact-button:hover {
-        color: black;
-        background-color: #ddd;
-    }
+        .contact-button:hover {
+            color: #707579;
+            background-color: #ddd;
+        }
 
-    .active-contact,
-    .active-contact:hover {
+    .active-contact {
         background-color: #3390ec;
         color: white;
     }
+
+        .active-contact:hover {
+            background-color: #3390ec;
+            color: white;
+        }
 
     .contact-avatar, .avatar {
         border-radius: 50%;
@@ -65,6 +70,7 @@
     }
 
     .contact-name {
+        font-weight: bold;
         flex-grow: 1;
         overflow: hidden;
     }
@@ -74,29 +80,41 @@
         flex-direction: column;
         flex-grow: 1;
         overflow: hidden;
-        background-image: radial-gradient(circle at top left, rgb(212, 218, 185), transparent), radial-gradient(circle at top right, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom left, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom right, rgb(209, 214, 141), transparent), url("https://localhost:7262/resources/pattern.svg");
+        position: relative;
         border-left: 2px solid #dddddd;
         max-width: 70%;
         margin-bottom: 0px;
     }
 
+        .chat-area::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle at top left, rgb(212, 218, 185), transparent), radial-gradient(circle at top right, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom left, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom right, rgb(209, 214, 141), transparent), url("https://localhost:7262/resources/pattern.svg");
+            background-size: 100%; /* Уменьшаем масштаб изображения */
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 1;
+        }
+
     .content {
         overflow-y: auto;
-        /* height: calc(100% - 140px); */
         height: 100%;
         overflow-x: hidden;
-    }
-
-    .content::-webkit-scrollbar {
-        width: 0;
-        height: 0;
-    }
-
-    /* Для Firefox */
-    .content {
+        position: relative;
+        z-index: 2;
+        scroll-behavior: smooth; /* добавлено для плавной прокрутки */
         scrollbar-width: none; /* Firefox */
         -ms-overflow-style: none; /* Internet Explorer 10+ */
     }
+
+        .content::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
 
     .messages {
         display: flex;
@@ -104,6 +122,7 @@
         flex-direction: column;
         margin-left: 100px;
         margin-right: 100px;
+        will-change: transform;
     }
 
     .input-container {
@@ -113,6 +132,7 @@
         background-color: white;
         width: 80%;
         border-radius: 12px;
+        z-index: 15;
     }
 
     .row {
@@ -135,21 +155,22 @@
         transition: color 0.3s;
     }
 
-    #sendButton:disabled, #uploadButton:disabled {
-        background-color: transparent;
-    }
+        #sendButton:disabled, #uploadButton:disabled {
+            background-color: transparent;
+        }
 
-    #sendButton:hover:enabled, #uploadButton:hover:enabled, #sendButton:enabled {
-        color: #3390ec;
-        transition: all 0.3s;
-    }
+        #sendButton:hover:enabled, #uploadButton:hover:enabled, #sendButton:enabled {
+            color: #3390ec;
+            transition: all 0.3s;
+        }
 
-    #sendButton i, #uploadButton i {
-        font-size: 24px;
-    }
+        #sendButton i, #uploadButton i {
+            font-size: 24px;
+        }
 
     ul#messagesList {
         padding-left: 0;
+        margin-bottom: 2px;
     }
 
     #fileInput {
@@ -179,10 +200,10 @@
         transition: all 0.2s;
     }
 
-    dialog input:hover, dialog input:active, dialog input:focus {
-        border: 2px solid #1751d0;
-        transition: all 0.2s;
-    }
+        dialog input:hover, dialog input:active, dialog input:focus {
+            border: 2px solid #1751d0;
+            transition: all 0.2s;
+        }
 
     .message-container {
         display: flex;
@@ -202,14 +223,14 @@
         border-top-right-radius: 18px;
     }
 
-    .message-image.sent {
-        max-width: 200px;
-        max-height: 200px;
-        border-bottom-left-radius: 18px;
-        border-top-left-radius: 18px;
-        border-bottom-right-radius: 5px;
-        border-top-right-radius: 18px;
-    }
+        .message-image.sent {
+            max-width: 200px;
+            max-height: 200px;
+            border-bottom-left-radius: 18px;
+            border-top-left-radius: 18px;
+            border-bottom-right-radius: 5px;
+            border-top-right-radius: 18px;
+        }
 
     .message-container.sent {
         justify-content: flex-end;
@@ -218,15 +239,15 @@
         margin-right: 100px;
     }
 
-    .message-container.sent .avatar {
-        order: 2;
-        margin-left: 5px;
-        margin-right: 0;
-    }
+        .message-container.sent .avatar {
+            order: 2;
+            margin-left: 5px;
+            margin-right: 0;
+        }
 
-    .message-container.sent .message-content {
-        order: 1;
-    }
+        .message-container.sent .message-content {
+            order: 1;
+        }
 
     .message-content {
         font-size: 14px;
@@ -295,17 +316,17 @@
         display: inline-block;
     }
 
-    .message-file.sent {
-        background-color: #daf5d5;
-        border-bottom-left-radius: 18px;
-        border-top-left-radius: 18px;
-        border-bottom-right-radius: 5px;
-        border-top-right-radius: 18px;
-        padding: 10px;
-        max-width: 70%;
-        word-wrap: break-word;
-        display: inline-block;
-    }
+        .message-file.sent {
+            background-color: #daf5d5;
+            border-bottom-left-radius: 18px;
+            border-top-left-radius: 18px;
+            border-bottom-right-radius: 5px;
+            border-top-right-radius: 18px;
+            padding: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+            display: inline-block;
+        }
 
     #messageInput {
         padding: 10px 18px 10px 10px;
@@ -316,27 +337,85 @@
         box-sizing: border-box;
     }
 
-    #messageInput::placeholder {
-        color: #ccc;
-    }
+        #messageInput::placeholder {
+            color: #ccc;
+        }
 
     .context-menu {
-        background-color: #f9f9f9;
-        border: 2px solid #ccc;
-        padding: 10px;
-    }
-
-    .user-context-menu {
-        display: none;
-        position: absolute;
         z-index: 1000;
-        background: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.6);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         padding: 10px;
         border-radius: 12px;
+        transform: scale(0.5); /* Start from half size */
+        transition: opacity 0.3s ease, transform 0.3s ease;
     }
+
+    /* Initial state for the context menu */
+    .user-context-menu {
+        margin-top: 10px;
+        display: none;
+        position: absolute;
+        z-index: 1200;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        border-radius: 12px;
+        opacity: 0;
+        transform: scale(0.5); /* Start from half size */
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Keyframes for scaling up animation */
+    @@keyframes scaleUp {
+        from {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Keyframes for scaling down animation */
+    @@keyframes scaleDown {
+        from {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        to {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+    }
+
+    .context-menu.show {
+        display: block;
+        animation: scaleUp 0.3s forwards;
+    }
+
+    .context-menu.hide {
+        animation: scaleDown 0.3s forwards;
+    }
+
+    /* Apply the scaling up animation when showing the menu */
+    .user-context-menu.show {
+        display: block;
+        animation: scaleUp 0.3s forwards;
+    }
+
+    /* Apply the scaling down animation when hiding the menu */
+    .user-context-menu.hide {
+        animation: scaleDown 0.3s forwards;
+    }
+
 
     .menu-list {
         list-style: none;
@@ -344,20 +423,30 @@
         margin: 0;
     }
 
-    .menu-list li {
-        align-items: center;
-        display: flex;
-        padding: 8px 12px;
-        cursor: pointer;
-        border-radius: 12px;
-        transition: all .3s;
-    }
+        .menu-list li {
+            font-size: 12pt;
+            align-items: center;
+            display: flex;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #707579;
+            transition: all .3s;
+        }
 
-    .menu-list li:hover {
-        background-color: #3390ec;
-        color: white;
-        transition: all .3s;
-    }
+        .menu-list label {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #707579;
+            align-items: center;
+            display: flex;
+            padding: 8px 12px;
+        }
+
+        .menu-list li:hover {
+            background-color: #3390ec;
+            color: white;
+            transition: all .3s;
+        }
 
     #messages-header {
         display: flex;
@@ -391,11 +480,11 @@
         transition: all .3s;
     }
 
-    .fixed-button:hover,
-    .fixed-button:active {
-        background-color: #1751d0;
-        transition: all .3s;
-    }
+        .fixed-button:hover,
+        .fixed-button:active {
+            background-color: #1751d0;
+            transition: all .3s;
+        }
 
     .search-container {
         display: flex;
@@ -418,9 +507,9 @@
         width: 100%;
     }
 
-    #search::placeholder {
-        color: #a3adb5;
-    }
+        #search::placeholder {
+            color: #a3adb5;
+        }
 
     #searchIcon {
         color: #b2b5b7;
@@ -444,22 +533,21 @@
         position: relative;
     }
 
+        #contacts-field.no-data {
+            background-image:
+        }
+
     .fixed-button.no-hidden {
         bottom: 20px; /* Расположение кнопки от нижнего края */
     }
 
-    .chat-header {
-        display: flex;
-        position: absolute;
+    #chat-header {
         z-index: 900;
+        display: none;
         width: 100%;
         align-items: center;
-        padding: 20px;
-        display: flex;
-        margin-bottom: 5px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px); /* For Safari */
+        padding: 10px;
+        background-color: white;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
@@ -483,20 +571,68 @@
         margin-top: 10px;
     }
 
-    #burger:hover,
-    #burger:active,
-    #burger:focus {
-        background-color: #f4f4f5;
-        transition: all 0.3s;
+        #burger:hover,
+        #burger:active,
+        #burger:focus {
+            background-color: #f4f4f5;
+            transition: all 0.3s;
+        }
+
+    #back {
+        display: none;
     }
 
     @@media (max-width: 800px) {
-        #contacts-field {
-            display: none;
+
+        #chat-header {
+            z-index: 900;
+            display: flex;
+            width: 100%;
+            align-items: center;
+            padding: 10px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
+        #back {
+            display: flex;
+            align-items: center;
+            border: none;
+            outline: none;
+            background-color: transparent;
+            color: #b2b5b7;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all .3s;
+            margin-right: 5px;
+        }
+
+            #back:hover {
+                background-color: #f4f4f5;
+                color: #b2b5b7;
+                transition: all .3s;
+            }
+
+        #contacts-field {
+            display: block; /* Ensure it's set to block to operate the transform */
+            position: absolute;
+            z-index: 950;
+            width: 80%;
+            height: 100%;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(-100%);
+        }
+
+            #contacts-field.show {
+                transform: translateX(0);
+            }
 
         .chat-area {
             max-width: 100%;
+            border: none;
         }
     }
 
@@ -510,69 +646,79 @@
             margin-right: 100px;
         }
 
-        .message-container.sent {
-            margin-left: 100px;
-            margin-right: 0px;
-        }
+            .message-container.sent {
+                margin-left: 100px;
+                margin-right: 0px;
+            }
+    }
+
+    #editName {
+        border-radius: 8px 8px 5px 5px;
+    }
+
+    #deleteContact {
+        border-radius: 5px 5px 8px 8px;
     }
 </style>
 
 <div class="main-container">
-        <div id="contacts-field">
-            @* <h4 id="messages-header">All messages</h4> *@
-            <div class="user-menu">
-                <button id="burger"><i class="material-icons">menu</i></button>
-                <div id="userContextMenu" class="user-context-menu">
-                    <ul class="menu-list">
-                    <li><i class="material-icons" style="margin-right: 10px; font-size: 20px; color: #a3adb5;">account_circle</i>@User.Identity!.Name</li>
-                    <li><i class="material-icons" style="margin-right: 10px; font-size: 20px; color: #a3adb5;">edit</i>Edit profile image</li>
-                    <li><i class="material-icons" style="margin-right: 10px; font-size: 20px; color: #a3adb5;">logout</i>Log out</li>
-                    </ul>
-                </div>
-                <div id="daun" class="search-container">
-                    <i id="searchIcon" class="material-icons">search</i>
-                    <input id="search" placeholder="Search" oninput="filterContacts()" />
-                </div>
-            </div>
-            <div class="contacts-container" id="contactsContainer"></div>
-            <button class="fixed-button" id="show"><i class="material-icons">edit</i></button>
-        </div>
-        <div class="chat-area">
-        <div class="chat-header">
-                <img src="https://localhost:7262/resources/1.png" height="32" width="32" style="border-radius: 50%;"/>
-                <div id="user-header" style="padding-left: 10px; font-weight: bold;"></div>
-            </div>
-            <div class="content">
-                <ul id="messagesList"></ul>
-            </div>
-            <div class="bottom-msg-input">
-                <div class="input-container">
-                    <input type="file" id="fileInput" />
-                    <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
-                    <input type="text" class="w-100" id="messageInput" placeholder="Message" />
-                    <button type="button" id="sendButton" disabled><i class="material-icons">arrow_upward</i>
-                    </button>
-                </div>
-            </div>
-            <dialog id="dialog">
-                <div class="addUserDialog">
-                    <input type="text" id="contactEmailInput" placeholder="Email" />
-                    <button class="add" id="addContactButton"><i class="material-icons">add</i></button>
-                    <button class="close"><i class="material-icons">close</i></button>
-                </div>
-            </dialog>
-            <dialog id="updateDialog">
-                <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name" />
-                <button id="saveDisplayNameButton"><i class="material-icons">save</i></button>
-                <button class="close"><i class="material-icons">close</i></button>
-            </dialog>
-            <div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
+    <div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
+        <ul class="menu-list">
+            <li id="editName"><i class="material-icons">edit</i>Edit Name</li>
+            <li id="deleteContact"><i class="material-icons">delete</i>Delete Contact</li>
+        </ul>
+    </div>
+    <div id="contacts-field">
+        @* <h4 id="messages-header">All messages</h4> *@
+        <div class="user-menu">
+            <button id="burger"><i class="material-icons">menu</i></button>
+            <div id="userContextMenu" class="user-context-menu">
                 <ul class="menu-list">
-                    <li id="editName">Edit Name</li>
-                    <li id="deleteContact">Delete Contact</li>
+                    <label>@User.Identity!.Name</label>
+                    <li style="border-radius: 8px 8px 5px 5px;"><i class="material-icons">edit</i>Profile picture</li>
+                    <li style="border-radius: 5px 5px 8px 8px;"><i class="material-icons">logout</i>Log out</li>
                 </ul>
             </div>
+            <div class="search-container">
+                <i id="searchIcon" class="material-icons">search</i>
+                <input id="search" placeholder="Search" oninput="filterContacts()" />
+            </div>
         </div>
+        <div class="contacts-container" id="contactsContainer"></div>
+        <button class="fixed-button" id="show"><i class="material-icons">edit</i></button>
+    </div>
+    <div class="chat-area">
+        <div id="chat-header">
+            <button id="back"><i class="material-icons">arrow_back</i></button>
+            <img id="chatHeaderImg" height="36" width="36" style="border-radius: 50%; background-color: white;"/>
+            <div id="user-header" style="padding-left: 10px; font-weight: bold;"></div>
+        </div>
+        <div class="content">
+            <ul id="messagesList"></ul>
+        </div>
+        <div class="bottom-msg-input">
+            <div class="input-container">
+                <input type="file" id="fileInput" />
+                <button type="button" id="uploadButton"><i class="material-icons">attach_file</i></button>
+                <input type="text" class="w-100" id="messageInput" placeholder="Message" />
+                <button type="button" id="sendButton" disabled>
+                    <i class="material-icons">arrow_upward</i>
+                </button>
+            </div>
+        </div>
+        <dialog id="dialog">
+            <div class="addUserDialog">
+                <input type="text" id="contactEmailInput" placeholder="Email" />
+                <button class="add" id="addContactButton"><i class="material-icons">add</i></button>
+                <button class="close"><i class="material-icons">close</i></button>
+            </div>
+        </dialog>
+        <dialog id="updateDialog">
+            <input type="text" id="newDisplayNameDialogInput" placeholder="New Display Name" />
+            <button id="saveDisplayNameButton"><i class="material-icons">save</i></button>
+            <button class="close"><i class="material-icons">close</i></button>
+        </dialog>
+    </div>
 </div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
@@ -581,26 +727,59 @@
 <script>
     document.getElementById('burger').addEventListener('click', function (event) {
         const menu = document.getElementById('userContextMenu');
-        const burger = document.getElementById('burger');
-        const isVisible = menu.style.display === 'block';
+        const isVisible = menu.classList.contains('show');
 
-        // Переключаем видимость меню
-        menu.style.display = isVisible ? 'none' : 'block';
+        // Calculate positioning and set transform origin dynamically
+        const rect = event.currentTarget.getBoundingClientRect();
+        menu.style.top = `${rect.bottom}px`;
+        menu.style.left = `${rect.left}px`;
+        menu.style.transformOrigin = `${rect.left - event.pageX + rect.width / 2}px ${rect.bottom - event.pageY}px`;
 
-        // Позиционирование меню в месте клика (можно адаптировать)
-        const rect = burger.getBoundingClientRect();
-        menu.style.top = rect.bottom + "px";
-        menu.style.left = rect.left + "px";
+        // Toggle visibility and animation class
+        if (isVisible) {
+            menu.classList.replace('show', 'hide');
+            setTimeout(() => {
+                menu.style.display = 'none'; // Ensures the menu is not clickable after it disappears
+                menu.classList.remove('hide');
+            }, 100); // Timeout matches the duration of the animation
+        } else {
+            menu.style.display = 'block'; // Make sure to set display before adding 'show' for the animation to trigger
+            menu.classList.add('show');
+        }
 
-        console.log(rect.left, rect.top);
-
-        // Предотвращаем стандартное поведение и всплывание событий
+        // Prevent default behavior and event bubbling
         event.preventDefault();
         event.stopPropagation();
     });
 
-    // Скрываем меню при клике вне его
-    window.addEventListener('click', function () {
-        document.getElementById('userContextMenu').style.display = 'none';
+    // Hide the menu when clicking outside
+    window.addEventListener('click', function (event) {
+        const menu = document.getElementById('userContextMenu');
+        if (!menu.contains(event.target) && menu.classList.contains('show')) {
+            menu.classList.replace('show', 'hide');
+            setTimeout(() => {
+                menu.style.display = 'none';
+                menu.classList.remove('hide');
+            }, 100); // Ensure the menu is hidden after animation
+        }
+    });
+
+    document.getElementById('back').addEventListener('click', function () {
+        var contactsField = document.getElementById('contacts-field');
+        // Toggle the 'show' class to slide in or out the contacts panel
+        contactsField.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function (event) {
+        var contactsField = document.getElementById('contacts-field');
+        var backButton = document.getElementById('back');
+
+        // Проверка, что клик был вне контактной панели и кнопки "назад"
+        if (!contactsField.contains(event.target) && !backButton.contains(event.target)) {
+            // Если панель открыта, скрыть её
+            if (contactsField.classList.contains('show')) {
+                contactsField.classList.remove('show');
+            }
+        }
     });
 </script>
