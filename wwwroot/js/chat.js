@@ -49,6 +49,8 @@ connection.on("ReceiveMessage", function (user, message, avatar) {
 
     li.appendChild(container);
     document.getElementById("messagesList").appendChild(li);
+
+    scrollToBottom();
 });
 
 connection.on("ReceiveFile", function (user, filePath, avatar) {
@@ -86,6 +88,8 @@ connection.on("ReceiveFile", function (user, filePath, avatar) {
 
     li.appendChild(container);
     document.getElementById("messagesList").appendChild(li);
+
+    scrollToBottom();
 });
 
 connection.on("LoadContacts", function (contacts) {
@@ -117,6 +121,7 @@ connection.on("LoadContacts", function (contacts) {
             var userNameHeader = document.getElementById("user-header");
             var chatHeader = document.getElementById("chat-header");
             chatHeaderImg.src = contact.avatarPath;
+            chatHeaderImg.style.display = 'flex';
             userNameHeader.textContent = button.textContent;
             chatHeader.style.display = "flex";
             loadChatHistory(contact.email);
@@ -331,6 +336,8 @@ document.getElementById("sendButton").addEventListener("click", function (event)
         alert("Please select a contact first.");
     }
     event.preventDefault();
+
+    scrollToBottom();
 });
 
 document.getElementById("uploadButton").addEventListener("click", function () {
@@ -360,6 +367,8 @@ document.getElementById("fileInput").addEventListener("change", function (event)
     } else {
         alert("Please select a contact first.");
     }
+
+    scrollToBottom();
 });
 
 document.getElementById("addContactButton").addEventListener("click", function (event) {

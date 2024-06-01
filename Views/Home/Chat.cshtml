@@ -56,7 +56,7 @@
 
     .contact-avatar, .avatar {
         border-radius: 50%;
-        background-color: #1751d0;
+        background-color: white;
         flex-shrink: 0;
     }
 
@@ -105,7 +105,7 @@
 
     .content {
         overflow-y: auto;
-        height: 100%;
+        height: fit-content;
         overflow-x: hidden;
         position: relative;
         z-index: 2;
@@ -585,7 +585,7 @@
         .fixed-button {
             display: flex;
             position: absolute;
-            bottom: 20px; /* Расположение кнопки от нижнего края */
+            bottom: -500px; /* Расположение кнопки от нижнего края */
             right: 20px; /* Расположение кнопки от правого края */
             background-color: #3390ec;
             color: white;
@@ -596,6 +596,10 @@
             border-radius: 50%;
             transition: all .3s;
         }
+
+            .fixed-button.no-hidden {
+                bottom: 80px; /* Расположение кнопки от нижнего края */
+            }
 
         #chat-header {
             z-index: 900;
@@ -673,7 +677,14 @@
         border-radius: 5px 5px 8px 8px;
     }
 
-    
+    .content-container {
+        display: flex; /* Use flexbox to allow vertical alignment */
+        flex-direction: column; /* Stack children vertically */
+        justify-content: flex-end; /* Align children to the end (bottom) */
+        height: 100%; /* Ensure it takes full height of its parent */
+        overflow-y: auto; /* Keeps the scrollbar functionality */
+    }
+
 </style>
 
 <div class="main-container">
@@ -714,11 +725,13 @@
     <div class="chat-area">
         <div id="chat-header">
             <button id="back"><i class="material-icons">arrow_back</i></button>
-            <img id="chatHeaderImg" height="36" width="36" style="border-radius: 50%; background-color: white;"/>
-            <div id="user-header" style="padding-left: 10px; font-weight: bold;"></div>
+            <img id="chatHeaderImg" height="36" width="36" style="display: none; border-radius: 50%; background-color: white;"/>
+        <div id="user-header" style="color: #707579; padding-left: 10px; font-weight: bold; white-space: nowrap; padding-right: 10px; overflow: hidden;"></div>
         </div>
-        <div class="content">
-            <ul id="messagesList"></ul>
+        <div class="content-container">
+            <div class="content">
+                <ul id="messagesList"></ul>
+            </div>
         </div>
         <div class="bottom-msg-input">
             <div class="input-container">
