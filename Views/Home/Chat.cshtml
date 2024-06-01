@@ -1,4 +1,7 @@
 ﻿@page
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<AppUser> signInManager;
+@inject UserManager<AppUser> UserManager
 
 <script>
     const username = "@User.Identity!.Name";
@@ -178,17 +181,16 @@
     }
 
     dialog {
-        border: solid 1px #ccc;
+        display: flex;
+        border: none;
+        outline: none;
         border-radius: 24px;
-        padding: 20px;
     }
 
     .addUserDialog, .add, .close {
         display: flex;
         border-radius: 24px;
         border: none;
-        padding: 12px;
-        margin-left: 10px;
         cursor: pointer;
     }
 
@@ -196,7 +198,6 @@
         border: 2px solid #ccc;
         outline: none;
         border-radius: 12px;
-        padding: 11px;
         transition: all 0.2s;
     }
 
@@ -347,7 +348,7 @@
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 10px;
+        padding: 5px;
         border-radius: 12px;
         transform: scale(0.5); /* Start from half size */
         transition: opacity 0.3s ease, transform 0.3s ease;
@@ -363,7 +364,7 @@
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 10px;
+        padding: 5px;
         border-radius: 12px;
         opacity: 0;
         transform: scale(0.5); /* Start from half size */
@@ -512,18 +513,15 @@
         }
 
     #searchIcon {
-        color: #b2b5b7;
-        padding-left: 5px;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        align-items: center;
+        margin-left: 10px;
+        color: #a3adb5;
     }
 
-    .search-container.active #searchIcon {
+    .hidden-icon {
         opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .search-container.active #search {
-        width: 100%;
-        transition: width 0.3s ease;
+        transform: scale(0.5);
     }
 
     #contacts-field {
@@ -583,6 +581,21 @@
     }
 
     @@media (max-width: 800px) {
+
+        .fixed-button {
+            display: flex;
+            position: absolute;
+            bottom: 20px; /* Расположение кнопки от нижнего края */
+            right: 20px; /* Расположение кнопки от правого края */
+            background-color: #3390ec;
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            z-index: 1000; /* Высокий z-index для отображения поверх других элементов */
+            border-radius: 50%;
+            transition: all .3s;
+        }
 
         #chat-header {
             z-index: 900;
@@ -659,26 +672,28 @@
     #deleteContact {
         border-radius: 5px 5px 8px 8px;
     }
+
+    
 </style>
 
 <div class="main-container">
-    <div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
-        <ul class="menu-list">
-            <li id="editName"><i class="material-icons">edit</i>Edit Name</li>
-            <li id="deleteContact"><i class="material-icons">delete</i>Delete Contact</li>
-        </ul>
-    </div>
     <div id="contacts-field">
-        @* <h4 id="messages-header">All messages</h4> *@
+        <div id="userContextMenu" class="user-context-menu">
+            <ul class="menu-list">
+                <label>@User.Identity!.Name</label>
+                <div>
+                    <li id="changeAvatar" style="border-radius: 8px 8px 5px 5px;"><i class="material-icons">edit</i>Profile picture</li>
+                    <input type="file" id="avatarInput" style="display: none;" accept="image/*">
+                </div>
+                <form method="post" asp-controller="Account" asp-action="Logout">
+                    <button type="submit" class="dropdown-item"><i class="material-icons">logout</i>Logout</button>
+                </form>
+                @*                  <li style="border-radius: 5px 5px 8px 8px;"><form method="post" asp-controller="Account" asp-action="Logout"><i class="material-icons">logout</i>Log out</form></li>
+                *@
+            </ul>
+        </div>
         <div class="user-menu">
             <button id="burger"><i class="material-icons">menu</i></button>
-            <div id="userContextMenu" class="user-context-menu">
-                <ul class="menu-list">
-                    <label>@User.Identity!.Name</label>
-                    <li style="border-radius: 8px 8px 5px 5px;"><i class="material-icons">edit</i>Profile picture</li>
-                    <li style="border-radius: 5px 5px 8px 8px;"><i class="material-icons">logout</i>Log out</li>
-                </ul>
-            </div>
             <div class="search-container">
                 <i id="searchIcon" class="material-icons">search</i>
                 <input id="search" placeholder="Search" oninput="filterContacts()" />
@@ -687,6 +702,15 @@
         <div class="contacts-container" id="contactsContainer"></div>
         <button class="fixed-button" id="show"><i class="material-icons">edit</i></button>
     </div>
+
+
+<div id="contextMenu" class="context-menu" style="display: none; position: absolute; z-index: 1000;">
+    <ul class="menu-list">
+        <li id="editName"><i class="material-icons">edit</i>Edit Name</li>
+        <li id="deleteContact"><i class="material-icons">delete</i>Delete Contact</li>
+    </ul>
+</div>
+
     <div class="chat-area">
         <div id="chat-header">
             <button id="back"><i class="material-icons">arrow_back</i></button>
@@ -782,4 +806,34 @@
             }
         }
     });
+
+    document.getElementById("changeAvatar").addEventListener("click", function () {
+        document.getElementById("avatarInput").click();
+    });
+
+    document.getElementById("avatarInput").addEventListener("change", function (event) {
+        var file = event.target.files[0];
+        if (file) {
+            var formData = new FormData();
+            formData.append("avatar", file);
+
+            fetch("/upload/avatar", {
+                method: "POST",
+                body: formData
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Avatar updated successfully");
+                        // Update avatar on all necessary UI elements
+                        var avatars = document.querySelectorAll(".avatar");
+                        avatars.forEach(avatar => avatar.src = data.avatarUrl);
+                    } else {
+                        alert("Error updating avatar: " + data.error);
+                    }
+                }).catch(error => {
+                    console.error("Error uploading avatar:", error);
+                });
+        }
+    });
 </script>
+

@@ -468,6 +468,27 @@ document.addEventListener("DOMContentLoaded", function () {
     contactField.addEventListener("mouseleave", function () {
         fixedButton.classList.remove("no-hidden");
     });
+
+    // show/hide searchIcon
+    const searchInput = document.getElementById('search');
+    const searchIcon = document.getElementById('searchIcon');
+
+    searchIcon.style.display = 'flex';
+    // Hide icon when the search input is focused
+    searchInput.addEventListener('focus', function () {
+        searchIcon.classList.add('hidden-icon');
+        setTimeout(() => {
+            searchIcon.style.display = 'none';
+        }, 300);            
+    });
+
+    // Show icon when the search input loses focus and there's no input
+    searchInput.addEventListener('blur', function () {
+        searchIcon.style.display = 'flex';
+        setTimeout(() => {
+            searchIcon.classList.remove('hidden-icon');
+        }, 300); 
+    });
 });
 
 // Удаление старого обработчика контекстного меню
@@ -564,14 +585,6 @@ function filterContacts() {
         } else {
             contacts[i].style.display = "none";
         }
-    }
-
-    // Добавляем/удаляем класс active в зависимости от наличия текста в поле ввода
-    var searchContainer = document.getElementById("searchContainer");
-    if (filter.length > 0) {
-        searchContainer.classList.add("active");
-    } else {
-        searchContainer.classList.remove("active");
     }
 }
 function scrollToBottom() {
