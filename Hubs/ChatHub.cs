@@ -278,5 +278,95 @@ namespace WebApplication1.Hubs
                 });
             }
         }
+
+        public async Task StartCall(string calleeEmail)
+        {
+            var callerEmail = Context.User.Identity.Name;
+            var caller = await _userManager.FindByNameAsync(callerEmail);
+            var callee = await _userManager.FindByNameAsync(calleeEmail);
+
+            if (caller == null || callee == null)
+            {
+                await Clients.Caller.SendAsync("Error", "Caller or callee not found");
+                return;
+            }
+
+            await Clients.User(callee.Id).SendAsync("IncomingCall", caller.Email);
+        }
+
+        public async Task AcceptCall(string callerEmail)
+        {
+            var calleeEmail = Context.User.Identity.Name;
+            var caller = await _userManager.FindByNameAsync(callerEmail);
+            var callee = await _userManager.FindByNameAsync(calleeEmail);
+
+            if (caller == null || callee == null)
+            {
+                await Clients.Caller.SendAsync("Error", "Caller or callee not found");
+                return;
+            }
+
+            await Clients.User(caller.Id).SendAsync("CallAccepted", callee.Email);
+        }
+
+        public async Task DeclineCall(string callerEmail)
+        {
+            var calleeEmail = Context.User.Identity.Name;
+            var caller = await _userManager.FindByNameAsync(callerEmail);
+            var callee = await _userManager.FindByNameAsync(calleeEmail);
+
+            if (caller == null || callee == null)
+            {
+                await Clients.Caller.SendAsync("Error", "Caller or callee not found");
+                return;
+            }
+
+            await Clients.User(caller.Id).SendAsync("CallDeclined", callee.Email);
+        }
+
+        public async Task EndCall(string calleeEmail)
+        {
+            var callerEmail = Context.User.Identity.Name;
+            var caller = await _userManager.FindByNameAsync(callerEmail);
+            var callee = await _userManager.FindByNameAsync(calleeEmail);
+
+            if (caller == null || callee == null)
+            {
+                await Clients.Caller.SendAsync("Error", "Caller or callee not found");
+                return;
+            }
+
+            await Clients.User(callee.Id).SendAsync("CallEnded", caller.Email);
+            await Clients.Caller.SendAsync("CallEnded", callee.Email);
+        }
+
+        public async Task SendSignal(string signal, string receiverEmail)
+        {
+            var senderEmail = Context.User.Identity.Name;
+            var receiver = await _userManager.FindByNameAsync(receiverEmail);
+
+            if (receiver == null)
+            {
+                await Clients.Caller.SendAsync("Error", "Receiver not found");
+                return;
+            }
+
+            await Clients.User(receiver.Id).SendAsync("ReceiveSignal", senderEmail, signal);
+        }
+
+        public async Task CancelCall(string calleeEmail)
+        {
+            var callerEmail = Context.User.Identity.Name;
+            var caller = await _userManager.FindByNameAsync(callerEmail);
+            var callee = await _userManager.FindByNameAsync(calleeEmail);
+
+            if (caller == null || callee == null)
+            {
+                await Clients.Caller.SendAsync("Error", "Caller or callee not found");
+                return;
+            }
+
+            await Clients.User(callee.Id).SendAsync("CallCancelled", caller.Email);
+        }
     }
 }

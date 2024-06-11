@@ -725,6 +725,17 @@
     <div class="chat-area">
         <div id="chat-header">
             <button id="back"><i class="material-icons">arrow_back</i></button>
+
+        <div id="video-call-container">
+            <video id="localVideo" autoplay muted></video>
+            <video id="remoteVideo" autoplay></video>
+            <div id="video-controls">
+                <button id="startCallButton">Start Call</button>
+                <button id="endCallButton" disabled>End Call</button>
+                <button id="muteVideoButton">Mute Video</button>
+            </div>
+        </div>
+
             <img id="chatHeaderImg" height="36" width="36" style="display: none; border-radius: 50%; background-color: white;"/>
         <div id="user-header" style="color: #707579; padding-left: 10px; font-weight: bold; white-space: nowrap; padding-right: 10px; overflow: hidden;"></div>
         </div>

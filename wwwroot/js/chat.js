@@ -594,3 +594,163 @@ function scrollToBottom() {
     const content = document.querySelector('.content');
     content.scrollTop = content.scrollHeight;
 }
+
+//
+var localStream;
+var peerConnection;
+var callTimer;
+
+function ensurePeerConnection() {
+    if (!peerConnection) {
+        peerConnection = new RTCPeerConnection();
+        console.log("Created RTCPeerConnection");
+
+        peerConnection.ontrack = function (event) {
+            console.log("Received remote track");
+            document.getElementById("remoteVideo").srcObject = event.streams[0];
+        };
+
+        peerConnection.onicecandidate = function (event) {
+            if (event.candidate) {
+                console.log(`Sending ICE candidate: ${JSON.stringify(event.candidate)}`);
+                connection.invoke("SendSignal", JSON.stringify({ type: 'candidate', candidate: event.candidate }), currentReceiverEmail).catch(function (err) {
+                    console.error(`Error sending ICE candidate: ${err.toString()}`);
+                });
+            }
+        };
+    }
+}
+document.getElementById("startCallButton").addEventListener("click", function () {
+    var calleeEmail = currentReceiverEmail;
+    console.log(`Starting call to ${calleeEmail}`);
+    ensurePeerConnection();
+    connection.invoke("StartCall", calleeEmail).catch(function (err) {
+        console.error(`Error starting call: ${err.toString()}`);
+    });
+});
+
+document.getElementById("endCallButton").addEventListener("click", function () {
+    var calleeEmail = currentReceiverEmail;
+    connection.invoke("EndCall", calleeEmail).catch(function (err) {
+        return console.error(err.toString());
+    });
+});
+
+document.getElementById("muteVideoButton").addEventListener("click", function () {
+    if (localStream && localStream.getVideoTracks().length > 0) {
+        localStream.getVideoTracks()[0].enabled = !localStream.getVideoTracks()[0].enabled;
+    }
+});
+
+connection.on("IncomingCall", function (callerEmail) {
+    if (confirm("Incoming call from " + callerEmail + ". Do you want to answer?")) {
+        startCall();
+        connection.invoke("AcceptCall", callerEmail).catch(function (err) {
+            return console.error(err.toString());
+        });
+    } else {
+        connection.invoke("DeclineCall", callerEmail).catch(function (err) {
+            return console.error(err.toString());
+        });
+    }
+});
+
+connection.on("CallAccepted", function (calleeEmail) {
+    console.log(`Call accepted by ${calleeEmail}`);
+    ensurePeerConnection(); // Убедитесь, что peerConnection создан
+    startCall();
+});
+
+connection.on("CallDeclined", function (calleeEmail) {
+    alert("Call declined by " + calleeEmail);
+    endCall();
+});
+
+connection.on("CallEnded", function (callerEmail) {
+    alert("Call ended by " + callerEmail);
+    endCall();
+});
+
+connection.on("ReceiveSignal", function (senderEmail, signal) {
+    console.log(`Received signal from ${senderEmail}: ${signal}`);
+    ensurePeerConnection(); // Убедитесь, что peerConnection создан
+
+    var signalData = JSON.parse(signal);
+    if (signalData.type === "offer") {
+        peerConnection.setRemoteDescription(new RTCSessionDescription(signalData)).then(() => {
+            return peerConnection.createAnswer();
+        }).then(answer => {
+            return peerConnection.setLocalDescription(answer);
+        }).then(() => {
+            connection.invoke("SendSignal", JSON.stringify(peerConnection.localDescription), senderEmail).catch(function (err) {
+                console.error(`Error sending answer signal: ${err.toString()}`);
+            });
+        }).catch(function (err) {
+            console.error(`Error handling offer: ${err.toString()}`);
+        });
+    } else if (signalData.type === "answer") {
+        peerConnection.setRemoteDescription(new RTCSessionDescription(signalData)).catch(function (err) {
+            console.error(`Error setting remote description from answer: ${err.toString()}`);
+        });
+    } else if (signalData.type === "candidate") {
+        peerConnection.addIceCandidate(new RTCIceCandidate(signalData.candidate)).catch(function (err) {
+            console.error(`Error adding received ICE candidate: ${err.toString()}`);
+        });
+    }
+});
+
+function startCall() {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (stream) {
+        localStream = stream;
+        document.getElementById("localVideo").srcObject = stream;
+
+        peerConnection = new RTCPeerConnection();
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+        peerConnection.ontrack = function (event) {
+            document.getElementById("remoteVideo").srcObject = event.streams[0];
+        };
+
+        peerConnection.onicecandidate = function (event) {
+            if (event.candidate) {
+                connection.invoke("SendSignal", JSON.stringify({ type: 'candidate', candidate: event.candidate }), currentReceiverEmail).catch(function (err) {
+                    return console.error(err.toString());
+                });
+            }
+        };
+
+        peerConnection.createOffer().then(offer => {
+            peerConnection.setLocalDescription(offer);
+            connection.invoke("SendSignal", JSON.stringify(offer), currentReceiverEmail).catch(function (err) {
+                return console.error(err.toString());
+            });
+        });
+
+        callTimer = setTimeout(function () {
+            connection.invoke("CancelCall", currentReceiverEmail).catch(function (err) {
+                return console.error(err.toString());
+            });
+        }, 20000); // 20 секунд ожидания
+    }).catch(function (err) {
+        console.error("Error accessing media devices.", err);
+    });
+
+    document.getElementById("startCallButton").disabled = true;
+    document.getElementById("endCallButton").disabled = false;
+}
+
+function endCall() {
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+    }
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+    }
+    clearTimeout(callTimer);
+    document.getElementById("localVideo").srcObject = null;
+    document.getElementById("remoteVideo").srcObject = null;
+
+    document.getElementById("startCallButton").disabled = false;
+    document.getElementById("endCallButton").disabled = true;
+}
