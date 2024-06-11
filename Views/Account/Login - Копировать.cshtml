@@ -1,0 +1,301 @@
+﻿﻿@using WebApplication1.ViewModels;
+@model LoginVM
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<AppUser> signInManager;
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    .inter-semibold {
+        font-family: "Inter", sans-serif;
+        font-size: 32px;
+        font-weight: 600;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+    }
+
+    .inter-regular {
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+    }
+
+    .inter-regular-valid {
+        font-family: "Inter", sans-serif;
+        font-size: 10px;
+        font-weight: 400;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        padding-left: 5px;
+    }
+
+    .frame {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+        background-image: radial-gradient(circle at top left, rgb(212, 218, 185), transparent), radial-gradient(circle at top right, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom left, rgb(110, 168, 137), transparent), radial-gradient(circle at bottom right, rgb(209, 214, 141), transparent), url("https://localhost:7262/resources/pattern_2.svg");
+        background-size: 100%; /* Уменьшаем масштаб изображения */
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .nav {
+        margin-top: 5px;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        align-items: flex-start;
+        align-content: center;
+        justify-content: center;
+    }
+
+    input {
+        transition: border 0.3s ease-in-out;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    input:hover,
+    input:active,
+    input:focus {
+        border: none;
+        outline: 3px solid #1751d0;
+    }
+
+    .lighter {
+        color: #757575;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+        margin-top: 15px;
+        padding: 10px;
+        padding-left: 12px;
+        outline: none;
+        border: 1px solid #dcdcde;
+        border-radius: 8px;
+        width: 100%;
+        box-sizing: border-box; /* Added this line */
+    }
+
+    input:hover,
+    input:focus {
+        border: 1px solid #1751d0;
+        outline: none;
+        transition: border 0.3s ease-in-out; /* Добавлен переход для плавности анимации */
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        background-color: #1751d0;
+        color: white;
+    }
+
+    button:hover {
+        background-color: #1143ae;
+    }
+
+    .under-pass {
+        width: 100%;
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    a {
+        text-decoration: none;
+        color: #1751d0;
+        font-weight: 600;
+    }
+
+    .account-field {
+        width: 100%;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .form-check-input {
+        cursor: pointer;
+    }
+
+    .or-divider {
+        position: relative;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .or-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #ffffff;
+        color: #757575;
+        padding: 0 10px;
+    }
+
+    .login-divider {
+        width: 100%;
+        height: 0.1px;
+        margin: 0;
+        background-color: #757575;
+    }
+
+    .google-login-button {
+        margin-top: 15px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        color: #000000;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .google-login-button img {
+        margin-right: 10px;
+        width: 20px;
+        height: 20px;
+    }
+
+    input.error {
+        border: 1px solid red;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .logo {
+        display: inline-flex;
+        flex-wrap: nowrap;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #login-btn {
+        margin-top: 15px;
+        padding: 10px;
+        padding-left: 12px;
+        outline: none;
+        border: 1px solid #dcdcde;
+        border-radius: 8px;
+        width: 100%;
+        box-sizing: border-box; /* Added this line */
+    }
+
+    #logged-btn {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        background: none;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 12px;
+        color: white;
+        transition: all .3s;
+    }
+
+    i {
+        margin-left: 5px;
+    }
+
+    #logged-btn:hover {
+        transform: scale(1.05);
+        transition: all .3s;
+    }
+</style>
+
+<div class="frame">
+
+    @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
+    {
+        <div class="text-danger inter-regular">@ViewData["ErrorMessage"]</div>
+    }
+
+    @if (signInManager.IsSignedIn(User))
+    {
+        <h1 style="color: white">You are already logged!</h1>
+
+        <button onclick="location.href='https://localhost:7262/Home/Chat'" id="logged-btn">Open messenger<i class="material-icons">lock_open</i></button>
+    } else {
+    <div class="inter-semibold">Login to account</div>
+    <form asp-action="Login" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
+        
+        <div class="nav inter-regular lighter">
+            Enter your credentials to access your account
+
+            @* <div asp-validation-summary="ModelOnly" class="text-danger inter-regular"></div> *@
+
+            <input asp-for="Email" class="inter-regular" placeholder="Enter email">
+            <span asp-validation-for="Email" class="text-danger inter-regular-valid"></span>
+
+            <input asp-for="Password" class="inter-regular" placeholder="Enter password">
+            <span asp-validation-for="Password" class="text-danger inter-regular-valid"></span>
+            
+            <div class="under-pass">
+                <div class="checkbox-container">
+                    <input asp-for="RememberMe" class="form-check-input" /> @Html.DisplayNameFor(a => a.RememberMe)
+                </div>
+                <a href="#">Forgot?</a>
+            </div>
+
+            <button class="inter-regular" id="login-btn">Login</button>
+
+            <div class="or-divider">
+                <hr class="login-divider">
+                <span class="or-text">or</span>
+            </div>
+
+            <a class="google-login-button inter-regular" href="@Url.Action("ExternalLogin", "Account", new { provider = "Google", returnUrl = ViewData["ReturnUrl"] })">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo">
+                <span>Sign in with Google</span>
+            </a>
+
+            <div class="account-field">
+                <div class="inter-regular">
+                    Not a memeber?
+                    <a href="/Account/Register">Create account</a>
+                </div>
+            </div>
+
+        </div>
+    </form>
+    }
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var inputs = document.querySelectorAll('input');
+        inputs.forEach(function (input) {
+            input.addEventListener('input', function () {
+                if (input.checkValidity() == false) {
+                    input.classList.add('error');
+                } else {
+                    input.classList.remove('error'); // Возвращаем цвет рамки к исходному состоянию, если поле валидно
+                }
+            });
+        });
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

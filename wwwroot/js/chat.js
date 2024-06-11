@@ -99,7 +99,6 @@ connection.on("LoadContacts", function (contacts) {
     if (contacts == null) {
 
     }
-
     contacts.forEach(function (contact) {
         var button = document.createElement("button");
         button.className = "contact-button";
@@ -141,6 +140,7 @@ connection.on("ChatHistory", function (messages) {
         li.style.listStyleType = "none";
         var container = document.createElement("div");
         container.classList.add("message-container");
+        var username_ = document.createElement("div");
 
         if (message.email === username) {
             container.classList.add("sent");
@@ -152,12 +152,10 @@ connection.on("ChatHistory", function (messages) {
 
         if (message.messageType === "text") {
             var messageContainer = document.createElement("div");
-            var username_ = document.createElement("div");
             var text = document.createElement("div");
             var time = document.createElement("span");
             if (message.email === username) {
                 text.textContent = `${message.content}`;
-                //text.textContent = `${message.content} (${new Date(message.sentAt).toLocaleTimeString()})`;
                 text.classList.add("message-content");
 
                 time.style.position = "relative";
@@ -235,18 +233,14 @@ connection.on("ChatHistory", function (messages) {
                     container.appendChild(image);
                 }
             }
-        } else {
-            var link = document.createElement("a");
-            link.href = message.content;
-            if (message.email === username) {
-                link.textContent = `${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
-            } else {
-                link.textContent = `${message.displayName} : ${message.content.split('/').pop()} (${new Date(message.sentAt).toLocaleTimeString()})`;
+            else {
+                var messageContainer = document.createElement("div");
+                messageContainer.classList.add("message-content");
+                messageContainer.style.display = "flex";
+                messageContainer.style.alignItems = "center";
+
+
             }
-            link.target = "_blank";
-            link.classList.add("message-file");
-            container.appendChild(img);
-            container.appendChild(link);
         }
 
         li.appendChild(container);

@@ -70,7 +70,6 @@ namespace WebApplication1.Controllers
                     return RedirectToAction("Chat", "Home");
                 }
 
-                //ModelState.AddModelError("", "Invalid login attempt");
                 ModelState.AddModelError("", "Invalid login attempt");
                 ViewData["ErrorMessage"] = "Invalid login attempt";
             }
@@ -90,14 +89,12 @@ namespace WebApplication1.Controllers
         {
             if (remoteError != null)
             {
-                // Handle external authentication error
                 return RedirectToAction(nameof(Login));
             }
 
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                // Handle external authentication failure
                 return RedirectToAction(nameof(Login));
             }
 
@@ -107,7 +104,6 @@ namespace WebApplication1.Controllers
                 var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
                 if (user != null)
                 {
-                    // Устанавливаем EmailConfirmed в true
                     user.EmailConfirmed = true;
                     await _userManager.UpdateAsync(user);
                 }
@@ -116,14 +112,12 @@ namespace WebApplication1.Controllers
             }
             if (result.IsLockedOut)
             {
-                // Handle account locked out
                 return RedirectToAction(nameof(Login));
             }
             else
             {
-                // If the user does not have an account, then create a new account.
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                var user = new AppUser { UserName = email, Email = email, EmailConfirmed = true }; // Устанавливаем EmailConfirmed в true
+                var user = new AppUser { UserName = email, Email = email, EmailConfirmed = true }; 
                 var createResult = await _userManager.CreateAsync(user);
                 if (createResult.Succeeded)
                 {
@@ -134,7 +128,6 @@ namespace WebApplication1.Controllers
                         return RedirectToLocal(returnUrl);
                     }
                 }
-                // If unable to create or sign in the user, display error page
                 return RedirectToAction(nameof(Login));
             }
         }

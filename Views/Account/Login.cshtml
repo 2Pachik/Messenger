@@ -1,4 +1,4 @@
-﻿﻿@using WebApplication1.ViewModels;
+﻿@using WebApplication1.ViewModels;
 @model LoginVM
 @using Microsoft.AspNetCore.Identity;
 @inject SignInManager<AppUser> signInManager;
@@ -42,26 +42,19 @@
         align-items: center;
     }
 
+    .form-container {
+        width: 400px; /* Fixed width */
+        max-width: 100%; /* Ensures it is responsive */
+        box-sizing: border-box; /* Ensures padding and border are included in the width */
+    }
+
     .nav {
         margin-top: 5px;
         display: flex;
         flex-direction: column;
         text-align: center;
-        align-items: flex-start;
         align-content: center;
         justify-content: center;
-    }
-
-    input {
-        transition: border 0.3s ease-in-out;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    input:hover,
-    input:active,
-    input:focus {
-        border: none;
-        outline: 3px solid #1751d0;
     }
 
     .lighter {
@@ -73,18 +66,17 @@
         margin-top: 15px;
         padding: 10px;
         padding-left: 12px;
-        outline: none;
-        border: 1px solid #dcdcde;
+        outline: 1px solid #ccc;
+        border: none;
         border-radius: 8px;
         width: 100%;
-        box-sizing: border-box; /* Added this line */
+        box-sizing: border-box;
     }
 
     input:hover,
     input:focus {
-        border: 1px solid #1751d0;
-        outline: none;
-        transition: border 0.3s ease-in-out; /* Добавлен переход для плавности анимации */
+        outline: 1px solid #1751d0;
+        transition: all 0.3s;
     }
 
     button {
@@ -92,11 +84,13 @@
         border: none;
         background-color: #1751d0;
         color: white;
+        width: 100%;
+        box-sizing: border-box;
     }
 
-    button:hover {
-        background-color: #1143ae;
-    }
+        button:hover {
+            background-color: #1143ae;
+        }
 
     .under-pass {
         width: 100%;
@@ -158,19 +152,18 @@
         cursor: pointer;
         font-family: 'Roboto', sans-serif;
         font-size: 14px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         width: 100%;
         box-sizing: border-box;
     }
 
-    .google-login-button img {
-        margin-right: 10px;
-        width: 20px;
-        height: 20px;
-    }
+        .google-login-button img {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
 
     input.error {
-        border: 1px solid red;
+        outline: 1px solid red;
         transition: all 0.3s ease-in-out;
     }
 
@@ -190,13 +183,46 @@
         border: 1px solid #dcdcde;
         border-radius: 8px;
         width: 100%;
-        box-sizing: border-box; /* Added this line */
+        box-sizing: border-box;
     }
 
+    #logged-btn {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        background: none;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 12px;
+        transition: all .3s;
+        color: black;
+    }
+
+    i {
+        margin-left: 5px;
+    }
+
+    #logged-btn:hover {
+        transform: scale(1.05);
+        transition: all .3s;
+    }
+
+    .input-title {
+        position: absolute;
+        left: 10px;
+        background: white;
+        padding: 0 5px;
+        color: #757575;
+        font-size: 12px;
+        height: fit-content;
+        width: fit-content;
+        top: 5px;
+    }
 </style>
 
 <div class="frame">
-
     @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
     {
         <div class="text-danger inter-regular">@ViewData["ErrorMessage"]</div>
@@ -204,62 +230,101 @@
 
     @if (signInManager.IsSignedIn(User))
     {
-        <a href="https://localhost:7262/Home/Chat">Open messanger</a>
-    } else {
-    <div class="inter-semibold">Login to account</div>
-    <form asp-action="Login" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
-        
-        <div class="nav inter-regular lighter">
-            Enter your credentials to access your account
-
-            @* <div asp-validation-summary="ModelOnly" class="text-danger inter-regular"></div> *@
-
-            <input asp-for="Email" class="inter-regular" placeholder="Enter email">
-            <span asp-validation-for="Email" class="text-danger inter-regular-valid"></span>
-
-            <input asp-for="Password" class="inter-regular" placeholder="Enter password">
-            <span asp-validation-for="Password" class="text-danger inter-regular-valid"></span>
-            
-            <div class="under-pass">
-                <div class="checkbox-container">
-                    <input asp-for="RememberMe" class="form-check-input" /> @Html.DisplayNameFor(a => a.RememberMe)
+        <h1>You are already logged!</h1>
+        <button onclick="location.href='https://localhost:7262/Home/Chat'" id="logged-btn">Open messenger<i class="material-icons">lock_open</i></button>
+    }
+    else
+    {
+        <img src="~/logo.ico" height="64" width="64"></img>
+        <div class="inter-semibold">BlinkTalk</div>
+        <div class="form-container">
+            <!-- Added container for form width control -->
+            <form asp-action="Login" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
+                <div class="nav inter-regular lighter">
+                    <div>Enter your credentials to access your account</div>
+                    <div style="display: flex; width: 100%; flex-wrap: wrap; position: relative;">
+                        <div class="input-title">Email</div>
+                        <input asp-for="Email" class="inter-regular" placeholder="" />
+                        <span asp-validation-for="Email" class="text-danger inter-regular-valid"></span>
+                    </div>
+                    <div style="display: flex; width: 100%; flex-wrap: wrap; position: relative;">
+                        <div class="input-title">Password</div>
+                        <input asp-for="Password" class="inter-regular" placeholder="">
+                        <span asp-validation-for="Password" class="text-danger inter-regular-valid"></span>
+                    </div>
+                    <div class="under-pass">
+                        <div class="checkbox-container">
+                            <input asp-for="RememberMe" class="form-check-input" /> @Html.DisplayNameFor(a => a.RememberMe)
+                        </div>
+                        <a href="#">Forgot?</a>
+                    </div>
+                    <button class="inter-regular" id="login-btn">Login</button>
+                    <div class="or-divider">
+                        <hr class="login-divider">
+                        <span class="or-text">or</span>
+                    </div>
+                    <a class="google-login-button inter-regular" href="@Url.Action("ExternalLogin", "Account", new { provider = "Google", returnUrl = ViewData["ReturnUrl"] })">
+                        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo">
+                        <span>Sign in with Google</span>
+                    </a>
+                    <div class="account-field">
+                        <div class="inter-regular">
+                            Not a member?
+                            <a href="/Account/Register">Create account</a>
+                        </div>
+                    </div>
                 </div>
-                <a href="#">Forgot?</a>
-            </div>
-
-            <button class="inter-regular" id="login-btn">Login</button>
-
-            <div class="or-divider">
-                <hr class="login-divider">
-                <span class="or-text">or</span>
-            </div>
-
-            <a class="google-login-button inter-regular" href="@Url.Action("ExternalLogin", "Account", new { provider = "Google", returnUrl = ViewData["ReturnUrl"] })">
-                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo">
-                <span>Sign in with Google</span>
-            </a>
-
-            <div class="account-field">
-                <div class="inter-regular">
-                    Not a memeber?
-                    <a href="/Account/Register">Create account</a>
-                </div>
-            </div>
-
+            </form>
         </div>
-    </form>
     }
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        var inputs = document.querySelectorAll('input');
+        var inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
         inputs.forEach(function (input) {
+            var title = input.previousElementSibling;
+
+            function setActive() {
+                input.style.outline = '1px solid #1751d0';
+                title.style.color = '#1751d0';
+            }
+
+            function setInactive() {
+                input.style.outline = '1px solid #ccc';
+                title.style.color = '#757575';
+            }
+
+            input.addEventListener('mouseenter', function () {
+                setActive();
+            });
+
+            input.addEventListener('mouseleave', function () {
+                if (!input.matches(':focus')) {
+                    setInactive();
+                }
+            });
+
+            input.addEventListener('focus', function () {
+                setActive();
+            });
+
+            input.addEventListener('blur', function () {
+                if (!input.matches(':hover')) {
+                    setInactive();
+                }
+            });
+
             input.addEventListener('input', function () {
                 if (input.checkValidity() == false) {
-                    input.classList.add('error');
+                    input.style.outline = '1px solid red';
+                    title.style.color = 'red';
                 } else {
-                    input.classList.remove('error'); // Возвращаем цвет рамки к исходному состоянию, если поле валидно
+                    if (input.matches(':focus') || input.matches(':hover')) {
+                        setActive();
+                    } else {
+                        setInactive();
+                    }
                 }
             });
         });
